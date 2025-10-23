@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>GRD-1 // ACCESS CONTROL</title>
+<meta name="viewport" content="width=800, initial-scale=1">
+<style>
+@font-face {
+  font-family:'Press Start 2P';
+  font-style:normal;
+  font-weight:400;
+  font-display:swap;
+  src:url(https://fonts.gstatic.com/s/pressstart2p/v16/e3t4euO8T-267oIAQAu6jDQyK3nVivM.woff2)format('woff2');
+}
+:root{--g:#64cd88;--gd:#0f4d1b;}
+html,body{
+  margin:0;
+  padding:0;
+  background:#000;
+  color:var(--g);
+  font-family:'Press Start 2P',monospace;
+  overflow:hidden;
+  display:block;
+}
+#console{
+  width:800px;
+  height:320px;
+  margin:0 auto;
+  background:#000;
+  border:2px solid var(--g);
+  box-sizing:border-box;
+  position:relative;
+  text-shadow:0 0 4px var(--gd),0 0 8px var(--gd);
+  overflow:hidden;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+#start{
+  position:absolute;inset:0;display:flex;
+  align-items:center;justify-content:center;
+  background:#000;z-index:2;
+}
+#start button{
+  padding:12px 20px;border:2px solid var(--g);
+  background:rgba(0,0,0,.85);color:var(--g);
+  font-family:'Press Start 2P',monospace;font-size:10px;
+  text-shadow:0 0 6px var(--gd);cursor:pointer;
+}
+#start button:hover{background:var(--g);color:#000;text-shadow:none;}
+#audioToggle{
+  position:absolute;top:10px;right:10px;
+  width:46px;height:46px;cursor:pointer;z-index:3;
+}
+#audioToggle svg{
+  width:100%;height:100%;
+  fill:none;stroke:var(--g);
+  stroke-width:5;
+  stroke-linecap:square;
+  stroke-linejoin:bevel;
+}
+#audioToggle.off .waves{display:none;}
+#audioToggle.off .mute{display:block;}
+.mute{display:none;stroke-width:4;}
+#panel{position:relative;z-index:1;display:none;width:90%;max-width:760px;text-align:left;}
+h1{margin:0 0 4px 0;font-size:14px;}
+h2{margin:0 0 10px 0;font-size:12px;}
+#timer{display:flex;gap:14px;flex-wrap:wrap;margin-top:10px;}
+.block{border:2px solid var(--g);padding:8px 10px;min-width:100px;text-align:center;box-shadow:inset 0 0 8px rgba(100,205,136,.15);}
+.value{font-size:16px;}
+.label{display:block;font-size:8px;margin-top:4px;}
+#progressContainer{margin-top:12px;display:flex;flex-direction:column;gap:4px;align-items:flex-start;}
+.barRow{display:flex;gap:3px;}
+.seg{width:20px;height:8px;border:1px solid var(--g);background:rgba(100,205,136,.08);}
+.seg.on{background:var(--g);}
+#done{display:none;margin-top:12px;font-size:12px;color:#ff5a5a;text-shadow:0 0 6px #ff4040,0 0 12px #ff8080;}
+p.target{font-size:8px;margin-top:16px;}
+footer{position:absolute;bottom:6px;left:0;right:0;display:flex;justify-content:space-between;
+  padding:0 12px;font-size:8px;color:var(--g);text-shadow:0 0 4px var(--gd);opacity:.85;}
+</style>
+</head>
+<body>
+<div id="console">
+  <div id="audioToggle" title="Toggle sound">
+    <svg viewBox="0 0 64 64">
+      <polygon points="12,26 26,26 32,20 32,44 26,38 12,38"/>
+      <polyline class="waves" points="40,24 44,24 44,30 48,30 48,38 44,38 44,44 40,44"/>
+      <polyline class="waves" points="48,20 52,20 52,26 56,26 56,42 52,42 52,48 48,48"/>
+      <line class="mute" x1="8" y1="8" x2="56" y2="56"/>
+    </svg>
+  </div>
+
+  <div id="start"><button id="go">CHECK TIMESTAMP</button></div>
+
+  <div id="panel">
+    <h1>GRD-1 // ACCESS CONTROL</h1>
+    <h2>Time Remaining Until Files Unlocked</h2>
+    <div id="timer">
+      <div class="block"><span id="d" class="value">10</span><span class="label">DAYS</span></div>
+      <div class="block"><span id="h" class="value">21</span><span class="label">HOURS</span></div>
+      <div class="block"><span id="m" class="value">32</span><span class="label">MINUTES</span></div>
+      <div class="block"><span id="s" class="value">57</span><span class="label">SECONDS</span></div>
+    </div>
+    <div id="progressContainer">
+      <div id="row1" class="barRow"></div>
+      <div id="row2" class="barRow"></div>
+    </div>
+    <div id="done">FILES UNLOCKED // ACCESS ENABLED</div>
+    <p class="target">Target: 31 / 10 / 2025 09:28 (Europe/London)</p>
+  </div>
+
+  <footer>
+    <span>LAWMAN MOS V1.1</span>
+    <span>GRD-1 NODE: ARCHIVE LOCK</span>
+  </footer>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded',()=>{
+  const TARGET=new Date(Date.UTC(2025,9,31,9,28,0));
+  const START=new Date(Date.UTC(2025,9,1,0,0,0));
+  const TOTAL=TARGET-START;
+  const dE=document.getElementById('d'),hE=document.getElementById('h'),
+        mE=document.getElementById('m'),sE=document.getElementById('s'),
+        done=document.getElementById('done'),row1=document.getElementById('row1'),
+        row2=document.getElementById('row2'),start=document.getElementById('start'),
+        panel=document.getElementById('panel'),button=document.getElementById('go'),
+        audioToggle=document.getElementById('audioToggle');
+  const segs=[];
+  for(let r=0;r<2;r++){
+    for(let i=0;i<24;i++){
+      const seg=document.createElement('div');
+      seg.className='seg';
+      (r===0?row1:row2).appendChild(seg);
+      segs.push(seg);
+    }
+  }
+  const audioCtx=new(window.AudioContext||window.webkitAudioContext)();
+  let audioEnabled=true;
+  function beep(freq=800,dur=0.08,vol=0.2){
+    if(!audioEnabled)return;
+    const t=audioCtx.currentTime;
+    const o=audioCtx.createOscillator(),g=audioCtx.createGain();
+    o.type='square';o.frequency.setValueAtTime(freq,t);
+    g.gain.setValueAtTime(vol,t);
+    o.connect(g);g.connect(audioCtx.destination);
+    o.start(t);o.stop(t+dur);
+  }
+  audioToggle.addEventListener('click',()=>{
+    audioEnabled=!audioEnabled;
+    audioToggle.classList.toggle('off',!audioEnabled);
+  });
+  const pad=n=>String(n).padStart(2,'0');
+  function render(ms){
+    if(ms<=0){
+      dE.textContent=hE.textContent=mE.textContent=sE.textContent='00';
+      done.style.display='block';return true;
+    }
+    const s=Math.floor(ms/1000),
+          d=Math.floor(s/86400),
+          h=Math.floor((s%86400)/3600),
+          m=Math.floor((s%3600)/60),
+          sec=s%60;
+    dE.textContent=pad(d);hE.textContent=pad(h);
+    mE.textContent=pad(m);sE.textContent=pad(sec);
+    return false;
+  }
+  function progressBar(now){
+    const pct=Math.min(1,Math.max(0,(now-START)/TOTAL));
+    const lit=Math.round(pct*48);
+    for(let i=0;i<48;i++)segs[i].classList.toggle('on',i<lit);
+  }
+  function run(){
+    start.style.display='none';panel.style.display='block';beep(1000,0.1,0.15);
+    function tick(){
+      const now=new Date(),left=TARGET-now;
+      const finished=render(left);progressBar(now);beep(400,0.02,0.08);
+      if(finished)clearInterval(loop);
+    }
+    tick();const loop=setInterval(tick,1000);
+  }
+  button.addEventListener('click',()=>{if(audioCtx.state==='suspended')audioCtx.resume();run();});
+});
+</script>
+</body>
+</html>
