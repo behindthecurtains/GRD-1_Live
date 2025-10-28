@@ -19,11 +19,10 @@ html,body{
 #frame{
   width:800px;
   height:600px;
-  border:2px solid #aaffcc; /* A now matches D colour */
+  border:2px solid #aaffcc;
   background:#000;
   position:relative;
   overflow:hidden;
-  /* Subtle full Ambilight halo */
   box-shadow:
     0 0 25px #aaffcc,
     0 0 50px #aaffcc;
@@ -43,7 +42,6 @@ iframe{
   pointer-events:none;
   opacity:0;
 }
-/* B->C, C->D, reboot animations */
 @keyframes glitch2{
   0%{opacity:0;}
   10%{opacity:1;background:linear-gradient(0deg,#00f 0%,#000 10%,#00f 20%,#000 30%,#00f 40%,#000 50%,#00f 60%,#000 70%,#00f 80%,#000 100%);}
@@ -86,13 +84,10 @@ const iframe=document.getElementById('viewer');
 const trans=document.getElementById('transition');
 const frame=document.getElementById('frame');
 
-/* Ambilight palette */
 const ambiColors=["#aaffcc","#c41616","#66a3ff","#aaffcc"];
 function setAmbilight(color){
   frame.style.borderColor=color;
-  frame.style.boxShadow=`
-    0 0 25px ${color},
-    0 0 50px ${color}`;
+  frame.style.boxShadow=`0 0 25px ${color},0 0 50px ${color}`;
 }
 setAmbilight(ambiColors[0]);
 
@@ -118,7 +113,6 @@ function playGlitchSound(type){
   }catch(e){console.warn("Audio ctx err",e);}
 }
 
-/* --- Data Collapse (Green trailing) --- */
 function dataCollapseEffect(){
   const cols=30;
   for(let i=0;i<cols;i++){
@@ -141,14 +135,12 @@ function dataCollapseEffect(){
   setTimeout(()=>{trans.innerHTML='';},1500);
 }
 
-/* --- Transition handler --- */
 function playTransition(num,nextSrc){
   playGlitchSound(num);
   frame.style.transition='box-shadow 0.4s ease, border-color 0.4s ease';
-  setAmbilight('black'); // fade-to-black between transitions
+  setAmbilight('black');
 
   if(num===1){
-    // custom A->B transition
     trans.style.opacity=1;
     dataCollapseEffect();
     setTimeout(()=>{iframe.src=nextSrc;},600);
@@ -160,7 +152,6 @@ function playTransition(num,nextSrc){
     return;
   }
 
-  // default transitions (B->C, C->D, reboot)
   trans.style.animation='';
   void trans.offsetWidth;
   trans.style.animation=`glitch${num} 1.2s steps(4,end) forwards`;
