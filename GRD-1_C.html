@@ -96,6 +96,41 @@ body{margin:0;background:#000;color:var(--pale2);font-family:'Press Start 2P',mo
 #glitch.flash{animation:glitchFlash .25s steps(2) 1;}
 @keyframes glitchFlash{0%{opacity:0;}40%{opacity:1;}100%{opacity:0;}}
 </style>
+
+<style>
+/* --- Responsive Cinematic Overrides (child) --- */
+html, body {
+  margin: 0 !important;
+  padding: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  background: #000 !important;
+  overflow: hidden !important;
+  font-size: clamp(8px, 2vw, 14px) !important;
+}
+#wrap {
+  width: 100% !important;
+  max-width: 800px !important;
+  aspect-ratio: 4 / 3 !important;
+  height: auto !important;
+  margin: 0 auto !important;
+}
+/* Make iframes/canvases scale inside containers if present */
+canvas, iframe, video, img {
+  max-width: 100% !important;
+  height: auto !important;
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  try { window.parent.postMessage({type:'ambilight', color:'#66a3ff'}, '*'); } catch(e) { /* ignore */ }
+});
+</script>
+
 </head>
 <body>
 <div id="wrap">
@@ -192,13 +227,13 @@ function startDraw(){ if(!analyser) return; const w=cvs.width,h=cvs.height; cons
 }
 
 // TTS (clean) with visual-only envelope — reliability-patched
-const Pascoe=`This is Doctor Lin Pascoe... if you can hear this—please, listen carefully.
+const Pascoe = `If you can hear this — please, listen carefully.
 
-I've been remotely monitoring your interactions with the GRD-1 archive. Something is responding. The more time you spend inside the system, the stronger it becomes.
+I've been remotely monitoring your interactions with the Grade-1 archive. Something is responding. The more time you spend inside the system, the stronger it becomes.
 
-I believe it's using your activity—your attention—to rebuild the signal.
+I believe it's using your activity — your attention — to rebuild the signal.
 
-The new Ghostwatch Blu-ray isn't just a release... it's a new broadcast. Another point of entry. Every restoration, every upload, every replay gives them a route back through.
+The new Ghostwatch On The Night Blu-ray isn't just a release... it's a new broadcast. Another point of entry. Every restoration, every upload, every replay gives it a route back through.
 
 Whatever we encountered at Foxhill Drive — it was never contained. It's adapting to new formats, new circuitry, anything that carries a trace of the original transmission.
 
@@ -208,9 +243,7 @@ Don't buy it. Don't play it. If you already have — disconnect your system now.
 
 If this transmission ends abruptly, it means they've—
 
-...
-
-Suzi?`;
+...is that you, Suzi?`;
 
 async function speakWithEnvelope(){
   if(!('speechSynthesis' in window)) return;
