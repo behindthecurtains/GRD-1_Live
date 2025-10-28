@@ -43,34 +43,23 @@ function log(msg){
   console.log(msg);
 }
 
-// Listen for navigation commands from child frames
+// Log all messages from any source
 window.addEventListener('message', (event) => {
-  if (!event.data || !event.data.action) return;
-  log([MESSAGE RECEIVED] action: ${event.data.action}, target: ${event.data.target});
-
-  if (event.data.action === 'load' && event.data.target) {
-    log([MASTER] Switching iframe source → ${event.data.target});
-    frame.style.opacity = 0;
-    setTimeout(() => {
-      frame.src = event.data.target;
-      frame.onload = () => {
-        frame.style.opacity = 1;
-        log([MASTER] Load complete for ${frame.src});
-      };
-    }, 250);
-  }
+  log([MESSAGE RECEIVED] origin=${event.origin} data=${JSON.stringify(event.data)});
 });
 
-// Optional manual control shortcuts for testing
-window.addEventListener('keydown',(e)=>{
-  if(e.key==='1'){
-    log('[DEBUG] Loading GRD-1_0.html manually');
-    frame.src='https://behindthecurtains.github.io/GRD-1_Live/GRD-1_0.html';
-  }
-  if(e.key==='2'){
-    log('[DEBUG] Loading ReadMe.html manually');
-    frame.src='https://behindthecurtains.github.io/GRD-1_Live/ReadMe.html';
-  }
+// Probe: send a test message to child after 3s
+setTimeout(()=>{
+  log('[MASTER] Sending test ping to child…');
+  frame.contentWindow.postMessage({test:'ping'}, '*');
+}, 3000);
+
+// Manual reloads
+window.addEventListener('keydown', (e)=>{
+  if(e.key==='1'){log('[DEBUG] Loading GRD-1_0.html manually');
+    frame.src='https://behindthecurtains.github.io/GRD-1_Live/GRD-1_0.html';}
+  if(e.key==='2'){log('[DEBUG] Loading ReadMe.html manually');
+    frame.src='https://behindthecurtains.github.io/GRD-1_Live/ReadMe.html';}
 });
 </script>
 </body>
