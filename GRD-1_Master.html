@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>GRD-1 Master v7 (Subtle Ambilight + Fixes)</title>
+<title>GRD-1 Master v8 (with ReadMe + Ghostwatch branching)</title>
 <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
 <style>
 html,body{
@@ -23,10 +23,8 @@ html,body{
   background:#000;
   position:relative;
   overflow:hidden;
-  box-shadow:
-    0 0 25px #aaffcc,
-    0 0 50px #aaffcc;
-  transition: box-shadow 10s ease, border-color 10s ease;
+  box-shadow:0 0 25px #aaffcc,0 0 50px #aaffcc;
+  transition:box-shadow 10s ease,border-color 10s ease;
 }
 iframe{
   width:100%;
@@ -69,16 +67,19 @@ iframe{
 </head>
 <body>
 <div id="frame">
-  <iframe id="viewer" src="https://behindthecurtains.github.io/GRD-1_Live/GRD-1_A.html"></iframe>
+  <iframe id="viewer" src="https://behindthecurtains.github.io/GRD-1_Live/GRD-1_0.html"></iframe>
   <div id="transition" class="transition"></div>
 </div>
 <script>
 const experiences=[
+ "https://behindthecurtains.github.io/GRD-1_Live/GRD-1_0.html",
  "https://behindthecurtains.github.io/GRD-1_Live/GRD-1_A.html",
  "https://behindthecurtains.github.io/GRD-1_Live/GRD-1_B.html",
  "https://behindthecurtains.github.io/GRD-1_Live/GRD-1_C.html",
  "https://behindthecurtains.github.io/GRD-1_Live/GRD-1_D.html"
 ];
+const readmeURL="https://behindthecurtains.github.io/GRD-1_Live/GRD-1_ReadMeReturn.html";
+
 let current=0;
 const iframe=document.getElementById('viewer');
 const trans=document.getElementById('transition');
@@ -140,38 +141,37 @@ function playTransition(num,nextSrc){
   frame.style.transition='box-shadow 0.4s ease, border-color 0.4s ease';
   setAmbilight('black');
 
-  if(num===1){
-    trans.style.opacity=1;
-    dataCollapseEffect();
-    setTimeout(()=>{iframe.src=nextSrc;},600);
-    setTimeout(()=>{
-      trans.style.opacity=0;
-      frame.style.transition='box-shadow 10s ease, border-color 10s ease';
-      setAmbilight(ambiColors[1]);
-    },1500);
-    return;
-  }
-
-  trans.style.animation='';
-  void trans.offsetWidth;
-  trans.style.animation=`glitch${num} 1.2s steps(4,end) forwards`;
+  trans.style.opacity=1;
+  dataCollapseEffect();
   setTimeout(()=>{iframe.src=nextSrc;},600);
   setTimeout(()=>{
-    frame.style.transition='box-shadow 10s ease, border-color 10s ease';
-    const newColor=ambiColors[current]||'#aaffcc';
-    setAmbilight(newColor);
     trans.style.opacity=0;
-  },1200);
+    frame.style.transition='box-shadow 10s ease, border-color 10s ease';
+    setAmbilight(ambiColors[num % ambiColors.length]);
+  },1500);
 }
 
+/* Listen for messages from child iframes */
 window.addEventListener("message",(e)=>{
   const msg=e.data;
-  if(msg==="experienceComplete"){
-    current++;
-    if(current<experiences.length){playTransition(current,experiences[current]);}
-  }else if(msg==="attemptReboot"){
-    current=0;
-    playTransition(4,experiences[0]);
+  switch(msg){
+    case "openReadMe":
+      playTransition(1,readmeURL);
+      break;
+    case "launchGhostwatch":
+      current=1;
+      playTransition(1,experiences[current]);
+      break;
+    case "experienceComplete":
+      current++;
+      if(current<experiences.length){
+        playTransition(current,experiences[current]);
+      }
+      break;
+    case "attemptReboot":
+      current=0;
+      playTransition(4,experiences[0]);
+      break;
   }
 });
 </script>
