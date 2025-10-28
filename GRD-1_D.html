@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>GRD-1_D_HAHa_v10.2_rebootGlitch_terminalRestore_iframe</title>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+<style>
+html, body {
+  margin:0; padding:0; background:#000; color:#64cd88;
+  font-family:'Press Start 2P', monospace;
+  height:100vh; overflow:hidden;
+}
+#app {
+  width:800px; height:600px; position:absolute; top:50%; left:50%;
+  transform:translate(-50%,-50%); overflow:hidden;
+  background:#000; box-shadow:0 0 15px #003300;
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+}
+#screen {
+  width:90%; line-height:1.3; white-space:pre-wrap;
+  font-size:18px; text-shadow:0 0 2px #64cd88, 0 0 4px #64cd88;
+  animation:flicker 0.15s infinite; margin:20px auto 0 auto;
+  flex-grow:1; overflow-y:auto; max-height:calc(100% - 80px);
+}
+@keyframes flicker {
+  0%,19%,21%,23%,25%,54%,56%,100%{opacity:1;}
+  20%,22%,24%,55%{opacity:0.4;}
+}
+#startButton, #rebootButton {
+  font-family:'Press Start 2P',monospace; font-size:16px;
+  padding:10px 20px; background:#000; color:#64cd88;
+  border:2px solid #64cd88; cursor:pointer; text-transform:uppercase;
+  box-shadow:0 0 5px #64cd88; transition: all 0.4s ease;
+}
+#startButton {
+  position:absolute; top:50%; left:50%;
+  transform:translate(-50%,-50%); z-index:10;
+}
+#rebootButton {
+  display:none;
+  position:absolute; top:50%; left:50%;
+  transform:translate(-50%,-50%) scale(1);
+  opacity:0;
+  z-index:20;
+  animation:none;
+}
+@keyframes glitchFlicker {
+  0% {opacity:0; transform:translate(-50%,-50%) scale(1);}
+  20% {opacity:0.8; transform:translate(-50%,-50%) scale(1.1);}
+  40% {opacity:0.2; transform:translate(-50%,-50%) scale(0.9);}
+  60% {opacity:1; transform:translate(-50%,-50%) scale(1.05);}
+  80% {opacity:0.5; transform:translate(-50%,-50%) scale(1);}
+  100% {opacity:1; transform:translate(-50%,-50%) scale(1);}
+}
+#terminal {
+  position:absolute;
+  left:0; right:0; bottom:40px;
+  height:130px;
+  border-top:2px solid #64cd88;
+  border-bottom:2px solid #64cd88;
+  background:rgba(5,18,8,0.85);
+  padding:10px;
+  display:none;
+  overflow-y:auto;
+  color:#64cd88;
+}
+#terminalHeader {
+  font-size:12px;
+  text-shadow:0 0 2px #64cd88, 0 0 4px #64cd88;
+}
+#terminalBody {
+  font-size:12px;
+  text-shadow:0 0 2px #64cd88, 0 0 4px #64cd88;
+  line-height:1.5;
+  white-space:pre-wrap;
+}
+canvas {
+  position:absolute; top:0; left:0; width:100%; height:100%;
+  z-index:-1;
+}
+</style>
+</head>
+<body>
+<div id="app">
+  <canvas id="glitchCanvas" width="800" height="600"></canvas>
+  <button id="startButton">HAHa</button>
+  <div id="screen"></div>
+  <button id="rebootButton">ATTEMPT REBOOT</button>
+  <div id="terminal">
+    <div id="terminalHeader">[TERMINAL: FOXHILL_RECOVER.LOG]</div>
+    <div id="terminalBody"></div>
+  </div>
+</div>
+
+<script>
+const canvas=document.getElementById('glitchCanvas');
+const ctx=canvas.getContext('2d');
+const W=canvas.width,H=canvas.height;
+function drawGlitch(){
+  ctx.clearRect(0,0,W,H);
+  for(let i=0;i<200;i++){
+    const x=Math.random()*W,y=Math.random()*H,w=20+Math.random()*140,h=10+Math.random()*70;
+    ctx.fillStyle=`rgba(100,255,136,${Math.random()*0.15})`;
+    ctx.fillRect(x,y,w,h);
+  }
+  if(Math.random()<0.02){
+    for(let i=0;i<2;i++){
+      const x=Math.random()*W,y=Math.random()*H,w=40+Math.random()*200,h=20+Math.random()*100;
+      ctx.fillStyle='rgba(255,255,255,0.8)';
+      ctx.fillRect(x,y,w,h);
+    }
+  }
+  requestAnimationFrame(drawGlitch);
+}
+drawGlitch();
+
+const audioCtx=new(window.AudioContext||window.webkitAudioContext)();
+function playGlitch(){
+  const o=audioCtx.createOscillator();
+  const g=audioCtx.createGain();
+  o.type='square';
+  o.frequency.value=1200;
+  g.gain.value=0.06;
+  o.connect(g).connect(audioCtx.destination);
+  o.start();
+  o.frequency.exponentialRampToValueAtTime(180,audioCtx.currentTime+0.08);
+  g.gain.exponentialRampToValueAtTime(0.0001,audioCtx.currentTime+0.09);
+  o.stop(audioCtx.currentTime+0.1);
+}
+
+const startButton=document.getElementById('startButton');
+const rebootButton=document.getElementById('rebootButton');
+const screen=document.getElementById('screen');
+const terminal=document.getElementById('terminal');
+const terminalHeader=document.getElementById('terminalHeader');
+const terminalBody=document.getElementById('terminalBody');
+
+let msg="Happy Hallowe'en, Ghostwatchers!\nTry not to have sleepless nights...\n\nKeep your cheese 'n' pickle sandwiches close.\n";
+let index=0;
+
+function typeEffect(){
+  if(index<msg.length){
+    screen.textContent+=msg.charAt(index);
+    index++;
+    if(Math.random()<0.2) playGlitch();
+    screen.scrollTop=screen.scrollHeight;
+    setTimeout(typeEffect,80+Math.random()*100);
+  } else {
+    setTimeout(triggerRebootAppear,1000);
+  }
+}
+
+function glitchBurst(){
+  const buffer = audioCtx.createBuffer(1, audioCtx.sampleRate * 0.15, audioCtx.sampleRate);
+  const data = buffer.getChannelData(0);
+  for (let i = 0; i < data.length; i++) {
+    data[i] = (Math.random() * 2 - 1) * (1 - i / data.length);
+  }
+  const src = audioCtx.createBufferSource();
+  const gain = audioCtx.createGain();
+  gain.gain.value = 0.2;
+  src.buffer = buffer;
+  src.connect(gain).connect(audioCtx.destination);
+  src.start();
+}
+
+function triggerRebootAppear(){
+  glitchBurst();
+  rebootButton.style.display='block';
+  rebootButton.style.animation='glitchFlicker 1s ease';
+  setTimeout(()=>{rebootButton.style.opacity=1;},1000);
+  setTimeout(()=>{activateTerminal();},3000);
+}
+
+function activateTerminal(){
+  terminal.style.display='block';
+  playTerminalHum();
+  startTerminalLog();
+}
+
+function playTerminalHum(){
+  const o=audioCtx.createOscillator();
+  const g=audioCtx.createGain();
+  o.type='sine';
+  o.frequency.value=180;
+  g.gain.value=0.08;
+  o.connect(g).connect(audioCtx.destination);
+  o.start();
+  g.gain.exponentialRampToValueAtTime(0.0001,audioCtx.currentTime+0.8);
+  o.stop(audioCtx.currentTime+1);
+}
+
+const logPool=[
+  "ERROR: FOXHILL SIGNAL LOST",
+  "WARNING: EARLY KIM CORRUPT",
+  "MEMORY MISSING: SUZANNE TUNSTALL",
+  "SEDDONS/PIPES STREAM INTERRUPTED",
+  "TRIPP MANNING VOLK BAUMGARTEN",
+  "BROKE DEMESCU LINNIFORD SYLVESTRI ETHERLEY",
+  "LINNIFORD / SYLVESTRI / ETHERLEY",
+  "CREW_ID: DEMESCU_A",
+  "CAM_OP: ETHERLEY_D",
+  "AUDIO_TECH: SYLVESTRI_P",
+  "CAST_REF: LACEY_S",
+  "C4ST_R3F: SM1TH_G",
+  "NATIONAL SÉANCE 2025 INITIATED",
+  "BBC1 ARCHIVE: STUDIO1 MIRROR",
+  "REBOOT SIGNAL NOT ACKNOWLEDGED"
+];
+
+function corrupt(s){
+  return s.replace(/[A-Z0-9]/g,c=>Math.random()<0.12?String.fromCharCode(33+(Math.random()*80|0)):c);
+}
+
+function startTerminalLog(){
+  let i=0;
+  setInterval(()=>{
+    const base=logPool[i%logPool.length];
+    const line=Math.random()<0.25?corrupt(base):base;
+    terminalBody.textContent+=line+"\n";
+    const arr=terminalBody.textContent.split("\n");
+    if(arr.length>14) terminalBody.textContent=arr.slice(-14).join("\n");
+    terminalHeader.textContent=(Math.random()<0.06)?corrupt("[TERMINAL: FOXHILL_RECOVER.LOG]"):"[TERMINAL: FOXHILL_RECOVER.LOG]";
+    i++;
+  },480);
+}
+
+startButton.addEventListener('click',()=>{
+  startButton.style.display='none';
+  audioCtx.resume();
+  screen.textContent="A:\\GRD-1_ARCHIVE> OFFLINE...\n";
+  playGlitch();
+  setTimeout(typeEffect,1000);
+});
+
+rebootButton.addEventListener('click',()=>{ if(window.parent){ window.parent.postMessage('attemptReboot','*'); } else { location.reload(); } });
+</script>
+</body>
+</html>

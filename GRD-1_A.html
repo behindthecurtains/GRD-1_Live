@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>GRD-1_A</title>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+<style>
+body {
+  margin:0;
+  background:black;
+  color:#64cd88;
+  font-family:'Press Start 2P', monospace;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  height:100vh;
+}
+#console {
+  width:800px;
+  height:600px;
+  padding:20px;
+  background:black;
+  border:2px solid #64cd88;
+  white-space:pre-wrap;
+  overflow-y:auto;
+  text-shadow:0 0 5px #0f4d1b, 0 0 10px #0f4d1b;
+  position:relative;
+}
+button#startBtn {
+  position:absolute;
+  top:50%;
+  left:50%;
+  transform:translate(-50%,-50%);
+  padding:10px 30px;
+  background:black;
+  color:#64cd88;
+  border:2px solid #64cd88;
+  font-family:'Press Start 2P', monospace;
+  font-size:16px;
+  cursor:pointer;
+}
+</style>
+</head>
+<body>
+
+<div id="console">
+  <button id="startBtn">START</button>
+</div>
+
+<audio id="modemSound" src="https://behindthecurtains.github.io/GRD-1/188828__0ktober__modem_dial.wav"></audio>
+
+<script>
+const consoleBox=document.getElementById('console');
+const startBtn=document.getElementById('startBtn');
+const modem=document.getElementById('modemSound');
+const audioCtx=new (window.AudioContext||window.webkitAudioContext)();
+
+function beep(freq=440,duration=100,volume=0.1){
+  const osc=audioCtx.createOscillator();
+  const gain=audioCtx.createGain();
+  osc.connect(gain); gain.connect(audioCtx.destination);
+  osc.type='square';
+  osc.frequency.value=freq;
+  gain.gain.value=volume;
+  osc.start(); osc.stop(audioCtx.currentTime+duration/1000);
+}
+
+let textQueue=[
+  { line: "LAWMAN MOS - SYSTEM ONLINE", delay:800, bleep:880 },
+  { line: "", delay:1500 },
+  { line: "> A:/ DRIVE INITIALISED", delay:600, bleep:660 },
+  { line: "READING DISK HEADER ...", delay:700 },
+  { line: "> HEADER OK", delay:500, bleep:720 },
+  { line: "FILES FOUND:", delay:400 },
+  { line: "README.TXT", delay:400 },
+  { line: "GHOSTWATCH.EXE", delay:400 },
+  { line: "LOG_24-10-31.TMP", delay:400 },
+  { line: "P1P.SYS", delay:700 },
+  { line: "", delay:1000 },
+  { line: ">> EXECUTING AUTOPLAY: GHOSTWATCH.EXE", delay:1000 },
+  { line: ">>> CONNECTION REQUEST INITIATED", delay:600 },
+  { line: "TARGET: BBC ENGINEERING AUXILIARY STORAGE UNIT", delay:700 },
+  { line: "LOCATION: TUNSTALL, STAFFORDSHIRE", delay:1000 },
+  { line: "", delay:800 },
+  { line: ">>> INITIATING HANDSHAKE PROTOCOL", delay:800 },
+  { line: "[001] PROTOCOL 2400 BAUD LINK", delay:400 },
+  { line: "[002] SIGNAL FOUND", delay:400 },
+  { line: "[003] NEGOTIATING PARAMETERS", delay:600 },
+  { line: "[004] AUTH CHANNEL OPEN", delay:800 },
+  { line: ">>> HANDSHAKE BEGIN", delay:400, handshake:true },
+  { line: ">>> LINK STABLE", delay:500, bleep:880 },
+  { line: "[INFO] REMOTE IDENT: GRD-1", delay:800 },
+  { line: "[WARNING] UNIT STATUS: DECOMMISSIONED 1993", delay:1200, bleep:660 },
+  { line: "[WARNING] SOURCE CONNECTION NON-STANDARD", delay:1000 },
+  { line: ">>> DATA TRANSFER INBOUND . . .", delay:700 },
+  { line: ">>> UNKNOWN ECHO PATTERN DETECTED", delay:900 },
+  { line: "ECHO SIGNATURE: 'GHOST ECHO'", delay:800 },
+  { line: "LATENCY DRIFT: -00:31:00", delay:600 },
+  { line: ">>> LINK COMPLETE", delay:1000, bleep:720 },
+  { line: ">>> ACCESSING GRD-1 ARCHIVE . . .", delay:1200 },
+  { line: "HANDSHAKE SUCCESSFUL", delay:800, bleep:880 }
+];
+
+function typeLine(line,delay,bleepFreq){
+  return new Promise(resolve=>{
+    setTimeout(()=>{
+      consoleBox.innerHTML+=line+"\n";
+      consoleBox.scrollTop=consoleBox.scrollHeight;
+      if(bleepFreq) beep(bleepFreq,120,0.15);
+      resolve();
+    },delay);
+  });
+}
+
+async function runSequence(){
+  await audioCtx.resume();
+  startBtn.remove();
+  consoleBox.textContent="";
+  for(const item of textQueue){
+    await typeLine(item.line,item.delay,item.bleep);
+    if(item.handshake){
+      modem.currentTime=0;
+      modem.play();
+      const wheel=document.createElement("span");
+      wheel.textContent="|";
+      consoleBox.appendChild(wheel);
+      let frame=0;
+      const spin=setInterval(()=>{wheel.textContent=["/","-","\\","|"][frame++%4];},100);
+      await new Promise(r=>setTimeout(r,6000));
+      clearInterval(spin);
+      wheel.remove();
+      consoleBox.innerHTML+="\n>>> HANDSHAKE COMPLETE\n";
+    }
+  }
+  window.parent.postMessage('experienceComplete','*');
+}
+startBtn.addEventListener('click',runSequence);
+</script>
+</body>
+</html>

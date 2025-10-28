@@ -3,33 +3,75 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>GRD-1 Master</title>
+<title>GRD-1 Master v7 (Subtle Ambilight + Fixes)</title>
 <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
 <style>
 html,body{
-  margin:0;background:#000;height:100%;
-  display:flex;justify-content:center;align-items:center;
-  overflow:hidden;font-family:'Press Start 2P',monospace;
+  margin:0;
+  background:#000;
+  height:100%;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  overflow:hidden;
+  font-family:'Press Start 2P',monospace;
 }
 #frame{
-  width:800px;height:600px;border:2px solid #aaffcc;
-  background:#000;position:relative;overflow:hidden;
-  box-shadow:0 0 25px #aaffcc,0 0 50px #aaffcc;
-  transition:box-shadow 10s ease,border-color 10s ease;
+  width:800px;
+  height:600px;
+  border:2px solid #aaffcc; /* A now matches D colour */
+  background:#000;
+  position:relative;
+  overflow:hidden;
+  /* Subtle full Ambilight halo */
+  box-shadow:
+    0 0 25px #aaffcc,
+    0 0 50px #aaffcc;
+  transition: box-shadow 10s ease, border-color 10s ease;
 }
-iframe{width:100%;height:100%;border:none;display:block;}
+iframe{
+  width:100%;
+  height:100%;
+  border:none;
+  display:block;
+}
 .transition{
-  position:absolute;inset:0;z-index:999;
-  background:#000;pointer-events:none;opacity:0;
+  position:absolute;
+  inset:0;
+  z-index:999;
+  background:#000;
+  pointer-events:none;
+  opacity:0;
 }
-@keyframes glitch2{0%{opacity:0;}10%{opacity:1;background:linear-gradient(0deg,#00f 0%,#000 10%,#00f 20%,#000 30%,#00f 40%,#000 50%,#00f 60%,#000 70%,#00f 80%,#000 100%);}30%{filter:hue-rotate(60deg);}50%{transform:translateX(5px);}70%{transform:translateX(-5px);}100%{opacity:0;}}
-@keyframes glitch3{0%{opacity:0;}20%{opacity:1;background:repeating-linear-gradient(180deg,#0f0 0 4px,#000 4px 8px);}40%{filter:blur(2px);}60%{transform:scaleY(1.1);}80%{opacity:0.6;}100%{opacity:0;}}
-@keyframes glitch4{0%{opacity:0;}25%{opacity:1;background:#f00;}50%{filter:blur(3px);}75%{opacity:1;background:#800;}100%{opacity:0;}}
+/* B->C, C->D, reboot animations */
+@keyframes glitch2{
+  0%{opacity:0;}
+  10%{opacity:1;background:linear-gradient(0deg,#00f 0%,#000 10%,#00f 20%,#000 30%,#00f 40%,#000 50%,#00f 60%,#000 70%,#00f 80%,#000 100%);}
+  30%{filter:hue-rotate(60deg);}
+  50%{transform:translateX(5px);}
+  70%{transform:translateX(-5px);}
+  100%{opacity:0;}
+}
+@keyframes glitch3{
+  0%{opacity:0;}
+  20%{opacity:1;background:repeating-linear-gradient(180deg,#0f0 0 4px,#000 4px 8px);}
+  40%{filter:blur(2px);}
+  60%{transform:scaleY(1.1);}
+  80%{opacity:0.6;}
+  100%{opacity:0;}
+}
+@keyframes glitch4{
+  0%{opacity:0;}
+  25%{opacity:1;background:#f00;}
+  50%{filter:blur(3px);}
+  75%{opacity:1;background:#800;}
+  100%{opacity:0;}
+}
 </style>
 </head>
 <body>
 <div id="frame">
-  <iframe id="viewer" src="https://behindthecurtains.github.io/GRD-1/GRD-1_0.html"></iframe>
+  <iframe id="viewer" src="https://behindthecurtains.github.io/GRD-1/GRD-1_A.html"></iframe>
   <div id="transition" class="transition"></div>
 </div>
 <script>
@@ -44,10 +86,13 @@ const iframe=document.getElementById('viewer');
 const trans=document.getElementById('transition');
 const frame=document.getElementById('frame');
 
+/* Ambilight palette */
 const ambiColors=["#aaffcc","#c41616","#66a3ff","#aaffcc"];
 function setAmbilight(color){
   frame.style.borderColor=color;
-  frame.style.boxShadow=`0 0 25px ${color},0 0 50px ${color}`;
+  frame.style.boxShadow=`
+    0 0 25px ${color},
+    0 0 50px ${color}`;
 }
 setAmbilight(ambiColors[0]);
 
@@ -73,6 +118,7 @@ function playGlitchSound(type){
   }catch(e){console.warn("Audio ctx err",e);}
 }
 
+/* --- Data Collapse (Green trailing) --- */
 function dataCollapseEffect(){
   const cols=30;
   for(let i=0;i<cols;i++){
@@ -81,11 +127,11 @@ function dataCollapseEffect(){
     bar.style.width='20px';
     bar.style.height='100%';
     bar.style.left=(i*(800/cols))+'px';
-    bar.style.background='linear-gradient(to bottom,rgba(100,205,136,0.8),rgba(0,0,0,0))';
+    bar.style.background='linear-gradient(to bottom, rgba(100,205,136,0.8), rgba(0,0,0,0))';
     bar.style.filter='blur(3px)';
     bar.style.opacity='0.5';
     bar.style.transform='translateY(-100%)';
-    bar.style.transition=`transform 1.2s ease-in ${Math.random()*0.3}s,opacity 1.2s ease-in ${Math.random()*0.3}s`;
+    bar.style.transition=`transform 1.2s ease-in ${Math.random()*0.3}s, opacity 1.2s ease-in ${Math.random()*0.3}s`;
     trans.appendChild(bar);
     setTimeout(()=>{
       bar.style.transform='translateY(100%)';
@@ -95,42 +141,36 @@ function dataCollapseEffect(){
   setTimeout(()=>{trans.innerHTML='';},1500);
 }
 
+/* --- Transition handler --- */
 function playTransition(num,nextSrc){
   playGlitchSound(num);
-  frame.style.transition='box-shadow 0.4s ease,border-color 0.4s ease';
-  setAmbilight('black');
+  frame.style.transition='box-shadow 0.4s ease, border-color 0.4s ease';
+  setAmbilight('black'); // fade-to-black between transitions
 
   if(num===1){
+    // custom A->B transition
     trans.style.opacity=1;
     dataCollapseEffect();
     setTimeout(()=>{iframe.src=nextSrc;},600);
     setTimeout(()=>{
       trans.style.opacity=0;
-      frame.style.transition='box-shadow 10s ease,border-color 10s ease';
+      frame.style.transition='box-shadow 10s ease, border-color 10s ease';
       setAmbilight(ambiColors[1]);
     },1500);
     return;
   }
 
+  // default transitions (B->C, C->D, reboot)
   trans.style.animation='';
   void trans.offsetWidth;
   trans.style.animation=`glitch${num} 1.2s steps(4,end) forwards`;
   setTimeout(()=>{iframe.src=nextSrc;},600);
   setTimeout(()=>{
-    frame.style.transition='box-shadow 10s ease,border-color 10s ease';
+    frame.style.transition='box-shadow 10s ease, border-color 10s ease';
     const newColor=ambiColors[current]||'#aaffcc';
     setAmbilight(newColor);
     trans.style.opacity=0;
   },1200);
-}
-
-/* New lightweight fade transition for ReadMe / GRD-1_0 */
-function fadeSwap(targetURL){
-  iframe.style.opacity=0;
-  setTimeout(()=>{
-    iframe.src=targetURL;
-    iframe.onload=()=>{iframe.style.opacity=1;};
-  },300);
 }
 
 window.addEventListener("message",(e)=>{
@@ -138,15 +178,9 @@ window.addEventListener("message",(e)=>{
   if(msg==="experienceComplete"){
     current++;
     if(current<experiences.length){playTransition(current,experiences[current]);}
-    return;
-  }
-  if(msg==="attemptReboot"){
+  }else if(msg==="attemptReboot"){
     current=0;
     playTransition(4,experiences[0]);
-    return;
-  }
-  if(typeof msg==="object" && msg.action==="load" && msg.target){
-    fadeSwap(msg.target);
   }
 });
 </script>
