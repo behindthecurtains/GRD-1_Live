@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>GRD-1 Master Debug</title>
+<style>
+html,body{
+  margin:0;height:100%;background:#000;display:flex;
+  align-items:center;justify-content:center;
+  color:#64cd88;font-family:monospace;
+}
+#experienceFrame{
+  width:800px;height:600px;border:2px solid #64cd88;
+  box-shadow:0 0 20px rgba(100,205,136,0.3);
+  transition:opacity .4s ease;
+}
+#console{
+  position:fixed;bottom:10px;left:10px;right:10px;
+  background:#111;padding:6px 10px;border:1px solid #64cd88;
+  font-size:13px;max-height:140px;overflow:auto;
+}
+</style>
+</head>
+<body>
+
+<!-- Main embedded experience -->
+<iframe id="experienceFrame"
+  src="https://behindthecurtains.github.io/GRD-1_Live/GRD-1_0.html"
+  allow="autoplay"
+  loading="eager"></iframe>
+
+<!-- On-screen debug console -->
+<div id="console">[MASTER] Ready and listening for postMessages…</div>
+
+<script>
+const frame = document.getElementById('experienceFrame');
+const consoleBox = document.getElementById('console');
+
+function log(msg){
+  consoleBox.innerHTML += <br>${msg};
+  consoleBox.scrollTop = consoleBox.scrollHeight;
+  console.log(msg);
+}
+
+// Listen for navigation commands from child frames
+window.addEventListener('message', (event) => {
+  if (!event.data || !event.data.action) return;
+  log([MESSAGE RECEIVED] action: ${event.data.action}, target: ${event.data.target});
+
+  if (event.data.action === 'load' && event.data.target) {
+    log([MASTER] Switching iframe source → ${event.data.target});
+    frame.style.opacity = 0;
+    setTimeout(() => {
+      frame.src = event.data.target;
+      frame.onload = () => {
+        frame.style.opacity = 1;
+        log([MASTER] Load complete for ${frame.src});
+      };
+    }, 250);
+  }
+});
+
+// Optional manual control shortcuts for testing
+window.addEventListener('keydown',(e)=>{
+  if(e.key==='1'){
+    log('[DEBUG] Loading GRD-1_0.html manually');
+    frame.src='https://behindthecurtains.github.io/GRD-1_Live/GRD-1_0.html';
+  }
+  if(e.key==='2'){
+    log('[DEBUG] Loading ReadMe.html manually');
+    frame.src='https://behindthecurtains.github.io/GRD-1_Live/ReadMe.html';
+  }
+});
+</script>
+</body>
+</html>
