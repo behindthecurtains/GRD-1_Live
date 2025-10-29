@@ -1,0 +1,307 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>LAWMAN MOS / GRD-1 — Launch Gateway</title>
+<link href="https://fonts.googleapis.com/css2?family=VT323&family=Press+Start+2P&display=swap" rel="stylesheet">
+<style>
+:root{ --green:#64cd88; --glow:#9cd2b8; --light:#eef2ef; --header:#3a6b5c; }
+html,body{
+  margin:0;height:100%;background:#000;
+  font-family:"VT323",monospace;color:var(--green);
+  display:flex;align-items:center;justify-content:center;overflow:hidden;
+}
+/* Outer frame */
+.frame{
+  width:800px;height:600px;background:#000;border:2px solid var(--green);
+  box-sizing:border-box;position:relative;overflow:hidden;
+  box-shadow:0 0 40px rgba(100,205,136,0.25), inset 0 0 22px rgba(156,210,184,0.10);
+}
+.frame::before{
+  content:"";position:absolute;inset:-6%;pointer-events:none;
+  background:radial-gradient(closest-side, rgba(156,210,184,0.15), transparent 70%);
+  filter:blur(10px);
+}
+.layer{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;}
+
+/* Global CRT flicker (subtle) */
+.gateway-fx{
+  width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  animation:flickerGlobal 5.2s linear infinite; position:relative;
+}
+.gateway-fx::after{
+  content:"";position:absolute;inset:0;pointer-events:none;
+  background:repeating-linear-gradient(to bottom, rgba(255,255,255,0.03) 0 1px, transparent 1px 3px);
+  mix-blend-mode:overlay;opacity:.22;
+}
+@keyframes flickerGlobal{
+  0% { filter:brightness(1); opacity:1; }
+  6% { filter:brightness(.98); }
+  11% { filter:brightness(1.02); }
+  18% { filter:brightness(.96); opacity:.98; }
+  25% { filter:brightness(1.03); }
+  37% { filter:brightness(.97); }
+  46% { filter:brightness(1); }
+  58% { filter:brightness(.95); opacity:.97; }
+  64% { filter:brightness(1.04); }
+  79% { filter:brightness(.98); }
+  87% { filter:brightness(1.02); }
+  100% { filter:brightness(1); opacity:1; }
+}
+
+/* Gateway text/buttons */
+h1{font-size:44px;margin:10px 0 0;text-shadow:0 0 8px var(--glow);}
+h2{font-size:20px;margin:8px 0 36px;color:var(--glow);}
+.btn{
+  font-family:'Press Start 2P',system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+  font-size:14px;padding:12px 22px;margin-top:6px;
+  border:2px solid var(--green);color:var(--green);background:transparent;
+  cursor:pointer;transition:all .15s ease;text-transform:uppercase;letter-spacing:0.5px;
+}
+.btn:hover{background:var(--green);color:#000;box-shadow:0 0 15px var(--green);}
+
+/* Inline SVG logo — fully visible, centered, breathing glow */
+.logo-wrap{ width:200px; margin-bottom:14px; opacity:.92; transition:opacity .6s ease; position:relative; }
+.logo-wrap svg{ display:block; width:100%; height:auto; color:var(--green);
+  filter: drop-shadow(0 0 4px rgba(100,205,136,0.55))
+          drop-shadow(0 0 10px rgba(100,205,136,0.35))
+          drop-shadow(0 0 18px rgba(100,205,136,0.20));
+  animation: breathe 3s ease-in-out infinite;
+}
+.logo-wrap path{ fill:none; stroke:currentColor; stroke-width:3.8; stroke-linejoin:round; stroke-linecap:round; }
+@keyframes breathe{
+  0%   { filter: drop-shadow(0 0 3px rgba(100,205,136,0.45)) drop-shadow(0 0 8px rgba(100,205,136,0.30)) drop-shadow(0 0 14px rgba(100,205,136,0.15)); opacity:.92; }
+  50%  { filter: drop-shadow(0 0 6px rgba(100,205,136,0.70)) drop-shadow(0 0 14px rgba(100,205,136,0.45)) drop-shadow(0 0 24px rgba(100,205,136,0.28)); opacity:1; }
+  100% { filter: drop-shadow(0 0 3px rgba(100,205,136,0.45)) drop-shadow(0 0 8px rgba(100,205,136,0.30)) drop-shadow(0 0 14px rgba(100,205,136,0.15)); opacity:.92; }
+}
+
+/* Wipe transition */
+#wipe{position:absolute;inset:0;background:#000;opacity:0;z-index:2;pointer-events:none;}
+#wipe.active{animation:wipe .7s ease forwards;}
+@keyframes wipe{0%{opacity:0;background:#fff;}50%{opacity:1;background:var(--glow);}100%{opacity:1;background:var(--light);}}
+
+/* Archive (v4 nested frames) */
+#archive{visibility:hidden;z-index:3;display:flex;align-items:center;justify-content:center;}
+.console{
+  width:740px;height:520px;background:var(--light);border:2px solid var(--header);
+  box-shadow:0 8px 30px rgba(0,0,0,0.15);display:flex;flex-direction:column;
+}
+.console header{
+  background:var(--header);color:#fff;padding:8px 14px;
+  font-family:'Press Start 2P',system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+  font-size:12px;text-transform:uppercase;letter-spacing:1px;
+}
+.console main{flex:1;display:flex;flex-direction:column;padding:16px 16px 10px 16px;gap:12px;}
+.terminal{flex:1;background:#fff;border:1px solid rgba(0,0,0,0.25);position:relative;overflow:hidden;padding:14px 14px 14px 18px;}
+.terminal::after{content:"";position:absolute;inset:0;pointer-events:none;background:repeating-linear-gradient(to bottom, rgba(0,0,0,0.05) 0 1px, transparent 1px 3px);mix-blend-mode:multiply;opacity:.25;animation:scanPulse 3.2s ease-in-out infinite alternate;}
+@keyframes scanPulse{0%{opacity:.18}100%{opacity:.30}}
+.line{opacity:0;white-space:pre-wrap;color:#111;font-size:22px;line-height:1.25;}
+.line.show{opacity:1;transition:opacity .12s ease;}
+.await{margin-top:8px;font-size:22px;color:#111;display:none;}
+.cursor{display:inline-block;width:10px;height:1em;background:var(--green);animation:blink 1s steps(2,start) infinite;vertical-align:-0.15em;}
+@keyframes blink{to{visibility:hidden;}}
+.actions{display:none;gap:14px;align-items:center;margin-top:56px;}
+.action{
+  font-family:'Press Start 2P',system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+  font-size:12px;padding:10px 14px;border:2px solid var(--green);
+  background:#fff;color:#000;cursor:pointer;transition:.15s;text-transform:uppercase;
+}
+.action:hover{background:#000;color:#fff;box-shadow:0 0 14px var(--green);}
+.console footer{margin:0;padding:6px 12px;border-top:1px solid rgba(0,0,0,.2);font-size:14px;color:#333;display:flex;justify-content:space-between;}
+</style>
+</head>
+<body>
+<div class="frame">
+  <!-- Gateway with global flicker -->
+  <div id="gateway" class="layer">
+    <div class="gateway-fx" id="gatewayFx">
+      <!-- Inline SVG: topmost path from your file; expanded viewBox so it's not cropped -->
+      <div class="logo-wrap" id="lawmanLogo" aria-label="LAWMAN MOS Logo">
+        <svg viewBox="0 70 194 155" role="img" focusable="false" aria-hidden="true" style="transform:translateX(-2.5px);">
+          <path d="m 119.01174,222.38868 c -0.0519,-0.66332 -0.0585,-7.19782 -0.0148,-14.52112 0.0437,-7.3233 0.0339,-18.12058 -0.022,-23.99396 l -0.10147,-10.67888 -0.78394,1.28481 c -9.09866,14.91195 -19.107466,30.99622 -19.497576,31.33286 l -0.475621,0.41042 -0.485378,-0.34427 c -0.400788,-0.28427 -2.104855,-3.11713 -9.777956,-16.25498 -5.110917,-8.75089 -9.346184,-15.94385 -9.411705,-15.98434 -0.07027,-0.0434 -0.119127,4.51444 -0.119127,11.11444 v 11.18808 H 68.200909 58.079622 v -29.95509 l 0,-29.95508 1.620729,-0.0925 c 0.891401,-0.0509 5.579939,-0.0698 10.418972,-0.042 9.744706,0.0559 9.415522,0.0259 10.090621,0.92082 0.439549,0.58267 1.196936,1.87553 9.755226,16.65213 8.66729,14.96479 8.387018,14.48803 8.517089,14.48803 0.106059,0 17.546691,-30.59982 17.546691,-30.7859 0,-0.0562 -0.14523,-0.0469 -0.32275,0.0206 -0.62346,0.23705 -3.06908,0.64445 -4.82674,0.80406 -2.09196,0.18996 -5.30698,0.1 -7.22097,-0.2021 -9.941354,-1.56903 -18.453483,-7.78343 -23.120429,-16.87941 -2.164444,-4.21855 -3.273518,-8.28866 -3.540515,-12.99309 -0.442875,-7.80335 1.351722,-14.404413 5.668393,-20.850058 1.646463,-2.458495 4.693215,-5.654923 7.067425,-7.414622 6.872009,-5.093345 14.836236,-7.091806 23.218526,-5.826213 7.12787,1.076196 14.00096,4.969307 18.78189,10.638601 3.84824,4.563299 6.2238,9.743059 7.40306,16.141922 0.34333,1.86293 0.34133,8.50173 -0.003,10.3864 -1.26706,6.93271 -4.04664,12.56995 -8.57379,17.38839 -2.73386,2.90976 -6.61655,5.65951 -10.23108,7.24572 -0.33455,0.14681 1.1136,0.18457 9.21601,0.24033 l 9.61292,0.0662 0.50837,0.41096 c 0.2796,0.22603 0.62743,0.61304 0.77297,0.86002 0.257,0.43616 0.26572,0.7237 0.30338,10.00852 0.0213,5.2577 0.0822,9.55946 0.13532,9.55946 0.0985,0 1.24619,-0.43429 4.78732,-1.81159 1.38167,-0.53739 1.70663,-0.6596 3.24146,-1.21901 1.53417,-0.55918 3.8752,-1.44966 5.75524,-2.18919 0.61853,-0.2433 1.95811,-0.75303 2.97685,-1.13274 1.01875,-0.3797 2.03087,-0.76475 2.24918,-0.85565 0.52733,-0.2196 1.17583,-0.47005 2.84454,-1.09857 0.76406,-0.28778 3.20508,-1.21262 5.42448,-2.0552 2.21941,-0.84257 4.27343,-1.6156 4.5645,-1.71784 0.29107,-0.10224 1.60089,-0.59025 2.9107,-1.08448 1.30982,-0.49423 2.97685,-1.12213 3.70452,-1.39532 0.72768,-0.2732 1.88865,-0.71131 2.57994,-0.97358 1.90459,-0.72257 2.55132,-0.82658 3.4724,-0.5584 0.84995,0.24746 1.58478,0.81788 1.89453,1.47066 0.60425,1.27342 0.60538,1.29336 0.7196,12.7024 0.0597,5.96722 0.17969,17.5775 0.26655,25.80062 0.0869,8.22312 0.1319,16.17169 0.10009,17.6635 -0.0651,3.05256 -0.19889,3.64619 -1.13276,5.02598 -0.66204,0.97815 -1.32209,1.33125 -2.64662,1.41582 -1.05394,0.0673 -1.51007,-0.0348 -3.33531,-0.74622 -0.40022,-0.15601 -0.93605,-0.36289 -1.19074,-0.45973 -1.34093,-0.50992 -2.40484,-0.92805 -4.5645,-1.79393 -2.19778,-0.88116 -3.55132,-1.41109 -6.15216,-2.40864 -0.54575,-0.20933 -1.09566,-0.43814 -1.22202,-0.50847 -0.12635,-0.0703 -0.2939,-0.12788 -0.37231,-0.12788 -0.0784,0 -0.4689,-0.14927 -0.86774,-0.33171 -0.39884,-0.18245 -1.03505,-0.44544 -1.4138,-0.58444 -0.37874,-0.139 -1.07562,-0.40207 -1.54861,-0.58459 -2.00112,-0.77224 -2.33815,-0.90257 -2.77839,-1.07441 -0.25469,-0.0994 -0.87983,-0.33812 -1.3892,-0.53048 -0.50937,-0.19235 -1.75965,-0.67746 -2.77839,-1.07803 -2.17698,-0.85596 -2.21219,-0.86976 -4.69681,-1.84027 -1.05512,-0.41214 -2.18633,-0.85647 -2.51378,-0.98741 -0.86855,-0.34729 -4.31256,-1.6589 -5.15987,-1.96507 -0.40022,-0.14461 -1.05513,-0.38958 -1.45535,-0.54436 -1.12538,-0.43524 -2.16309,-0.79948 -2.27767,-0.79948 -0.0571,0 -0.10381,7.49309 -0.10381,16.65132 v 16.65131 l -0.40235,0.55546 c -0.2213,0.3055 -0.67948,0.73122 -1.01819,0.94603 l -0.61583,0.39057 h -9.81371 -9.81371 z m 19.33149,-1.14485 c 0.11441,-0.0728 0.16774,-4.47601 0.2103,-17.36377 0.0487,-14.75902 0.0854,-17.35269 0.25235,-17.86163 0.15356,-0.46806 0.25007,-0.58559 0.45122,-0.54955 0.54364,0.0974 3.88245,1.28307 6.93726,2.46349 1.53843,0.59447 2.37005,0.91438 2.77839,1.06879 0.25469,0.0963 1.4752,0.5714 2.71224,1.05576 1.23705,0.48436 2.45756,0.95864 2.71224,1.05395 0.25469,0.0953 0.8391,0.32815 1.29869,0.51742 0.45959,0.18927 0.8945,0.34412 0.96647,0.34412 0.072,0 0.38061,0.11161 0.68588,0.24802 0.5407,0.24162 5.05327,2.03809 6.37642,2.53848 2.06161,0.77966 3.86445,1.47775 4.2222,1.63488 0.53265,0.23396 1.81854,0.73918 3.38531,1.33006 0.69129,0.26072 1.52481,0.58699 1.85226,0.72505 0.32745,0.13806 1.19074,0.47186 1.91841,0.74178 1.15283,0.42762 2.7183,1.04982 4.82911,1.91934 4.44904,1.8327 5.06433,1.87366 5.84081,0.38878 0.30774,-0.5885 0.3119,-0.65219 0.35894,-5.4909 0.0445,-4.57482 -0.15097,-27.82276 -0.3743,-44.52261 -0.1041,-7.78444 -0.13627,-8.15604 -0.7404,-8.5519 -0.40601,-0.26604 -0.69591,-0.19286 -3.60452,0.90981 -1.14174,0.43284 -2.79034,1.0423 -3.66355,1.35436 -0.87321,0.31205 -1.79603,0.65922 -2.05072,0.77148 -0.54225,0.23902 -2.97707,1.16309 -3.83682,1.45616 -0.32746,0.11162 -0.89306,0.31727 -1.2569,0.457 -0.36383,0.13973 -1.82249,0.68476 -3.24145,1.21119 -1.41897,0.52643 -2.77588,1.04201 -3.01535,1.14573 -0.23948,0.10372 -0.92415,0.37234 -1.5215,0.59694 -0.59735,0.2246 -1.62192,0.61618 -2.27683,0.87017 -0.65491,0.25399 -1.39912,0.54079 -1.65381,0.63733 -0.25468,0.0965 -1.23704,0.47384 -2.18302,0.83844 -2.87894,1.10961 -6.83173,2.60578 -8.59979,3.25512 -0.6549,0.24052 -2.44101,0.91495 -3.96913,1.49874 -3.15626,1.20578 -5.3539,1.93351 -5.47464,1.81288 -0.0452,-0.0451 -0.11191,-4.91476 -0.1483,-10.82138 l -0.0661,-10.73931 -10.18744,-0.0318 -10.18744,-0.0318 -0.34697,0.62723 c -0.81465,1.47265 -15.86401,27.93806 -16.9655,29.83509 -0.66558,1.14627 -1.50783,2.41319 -1.871667,2.81538 l -0.661522,0.73124 -1.637246,-2.81538 c -0.900485,-1.54846 -4.376257,-7.54881 -7.723938,-13.3341 -10.383824,-17.9448 -10.227356,-17.68484 -10.701581,-17.77969 -0.226239,-0.0453 -4.333342,-0.0823 -9.126896,-0.0823 l -8.715553,0 v 27.85248 l 0,27.85248 7.839036,-0.0341 7.839037,-0.0341 0.09137,-12.90031 c 0.05025,-7.09517 0.139558,-13.24459 0.198457,-13.66538 l 0.10709,-0.76507 1.065338,1.42663 c 0.718634,0.96234 4.221274,6.83057 10.762769,18.03164 5.333587,9.13275 9.740525,16.65099 9.793195,16.7072 0.05267,0.0562 4.670495,-7.32675 10.261835,-16.40655 5.59134,-9.0798 10.73698,-17.39129 11.43476,-18.46998 l 1.26869,-1.96124 0.0813,1.56431 c 0.0447,0.86037 0.0894,13.36809 0.0992,27.79494 l 0.0179,26.23062 8.50055,-0.002 c 4.67531,-0.001 8.56954,-0.0459 8.65385,-0.0996 z m -26.61022,-85.56864 c 4.98308,-0.62117 9.5526,-2.50354 13.75571,-5.66653 1.46635,-1.10348 4.59499,-4.26797 5.71393,-5.7794 2.3116,-3.12243 4.16242,-6.98359 5.05907,-10.55416 0.83937,-3.34252 0.86882,-3.6102 0.86932,-7.9032 5.1e-4,-4.33605 -0.0459,-4.72338 -1.00337,-8.374097 -0.67436,-2.571292 -2.10823,-5.828228 -3.5654,-8.098609 -1.64755,-2.567003 -4.53194,-5.784394 -6.67664,-7.447458 -10.5029,-8.144277 -24.49908,-8.24446 -35.060666,-0.250959 -1.030166,0.779677 -3.828089,3.51919 -4.889657,4.787579 -1.047622,1.251726 -2.347031,3.235252 -3.293721,5.027812 -1.905018,3.607157 -2.982682,7.190936 -3.401758,11.312582 -0.198252,1.94982 -0.09011,6.09069 0.205598,7.87249 1.081906,6.5191 4.079927,12.40486 8.592865,16.86963 4.696097,4.64599 9.914275,7.20674 16.810939,8.24974 1.29325,0.19558 5.15487,0.17011 6.88378,-0.0454 z m -89.970949,87.60762 -0.529218,-0.15925 -0.100098,-3.76683 c -0.134869,-5.07529 -0.06157,-83.03585 0.0782,-83.17541 0.06072,-0.0606 4.476259,-0.11024 9.812303,-0.11024 h 9.701898 l 0.573593,0.40265 c 0.368869,0.25894 0.626847,0.56589 0.722801,0.86002 0.108424,0.33235 0.165337,9.3099 0.208214,32.84359 0.03993,21.91829 0.102951,32.43017 0.194967,32.5222 0.09082,0.0908 5.775751,0.16263 17.123665,0.21627 l 16.987701,0.0803 0.503862,0.33251 c 0.277124,0.18289 0.649231,0.58059 0.826903,0.88378 l 0.32304,0.55125 v 8.4695 8.46949 l -0.391334,0.54025 c -0.215235,0.29714 -0.652109,0.69308 -0.970831,0.87987 l -0.579496,0.33963 -26.978476,-0.0102 c -20.621852,-0.008 -27.10317,-0.0477 -27.507694,-0.16942 z m 54.152196,-2.22847 c 0.119885,-0.11989 0.158269,-2.0397 0.156739,-7.83942 -0.0011,-4.22435 -0.04959,-7.75557 -0.107724,-7.84714 -0.08351,-0.13156 -3.690805,-0.1871 -17.185321,-0.26463 l -17.079624,-0.0981 -0.508368,-0.4046 c -0.279602,-0.22253 -0.642325,-0.66681 -0.806052,-0.98729 l -0.297685,-0.58268 -0.01746,-28.78266 c -0.0096,-15.83046 -0.05425,-30.39023 -0.09923,-32.35504 l -0.08177,-3.5724 -8.302101,-0.0341 -8.302102,-0.0341 v 41.48045 41.48044 h 26.235965 c 20.229344,0 26.272313,-0.0363 26.39473,-0.15877 z m -30.535858,-86.4463 c -6.752869,-0.95342 -12.46118,-4.09214 -17.146844,-9.42819 -3.595656,-4.09476 -5.952298,-9.76028 -6.421878,-15.43863 -0.771815,-9.33311 3.091779,-18.179464 10.495713,-24.031714 3.286175,-2.597473 7.48206,-4.498308 11.703698,-5.302052 2.148467,-0.40904 7.421301,-0.440439 9.560152,-0.05693 7.508867,1.346387 13.874809,5.549275 18.163517,11.99182 2.032306,3.052954 3.494959,6.851128 4.229022,10.981796 0.270029,1.5195 0.224822,6.71708 -0.07308,8.40174 -0.533214,3.01541 -1.183692,5.05049 -2.467863,7.72093 -3.823564,7.95112 -11.312661,13.55375 -20.104176,15.04002 -1.804429,0.30505 -6.164602,0.37163 -7.938264,0.12121 z m 7.938264,-2.37449 c 9.007438,-1.63536 16.490304,-8.11603 19.386417,-16.78995 0.245363,-0.73487 0.610974,-2.11014 0.812469,-3.05616 0.342535,-1.60821 0.366619,-1.93081 0.370403,-4.96166 0.0036,-2.90336 -0.02866,-3.40039 -0.309406,-4.76319 -1.084524,-5.264533 -3.541001,-9.776558 -7.317011,-13.43979 -1.42396,-1.381431 -2.12486,-1.942438 -3.776958,-3.023118 -4.461004,-2.918054 -9.451402,-4.200583 -15.185765,-3.902731 -5.351767,0.27798 -10.700776,2.49316 -14.770814,6.117025 -4.298782,3.827534 -6.932921,8.373209 -8.141813,14.050144 -0.343491,1.61303 -0.366256,1.92173 -0.365901,4.96166 4e-4,3.42384 0.110291,4.30401 0.867256,6.94632 1.361036,4.75091 4.00972,8.88605 7.772864,12.13502 1.677157,1.44801 3.133218,2.41466 5.244795,3.48192 2.400709,1.2134 4.761298,1.96284 7.4752,2.37321 1.709905,0.25856 6.206842,0.18566 7.938264,-0.1287 z"/>
+        </svg>
+      </div>
+      <h1>LAWMAN MOS / PROJECT GRD-1</h1>
+      <h2>CONFIDENTIAL - POST-TRANSMISSION EVALUATION GROUP ACCESS ONLY</h2>
+      <button class="btn" id="startBtn">LAUNCH GATEWAY</button>
+    </div>
+  </div>
+
+  <!-- Archive v4 -->
+  <div id="archive" class="layer">
+    <section class="console">
+      <header>LAWMAN MOS ARCHIVE INTERFACE</header>
+      <main>
+        <div class="terminal" id="terminal">
+          <div class="line" data-text="> LAWMAN MOS ARCHIVE INTERFACE v1.07"></div>
+          <div class="line" data-text="> Security Level: CLASSIFIED / INTERNAL USE ONLY"></div>
+          <div class="line" data-text=""></div>
+          <div class="line" data-text="> PRIMARY INDEX FILES LOCATED:"></div>
+          <div class="line" data-text=">   • README.TXT – Operational Overview & Handling Protocols"></div>
+          <div class="line" data-text=">   • GHOSTWATCH.EXE – Active Reconstruction Environment"></div>
+          <div class="line" data-text=""></div>
+          <div class="line" data-text="> Advisory:"></div>
+          <div class="line" data-text=">   Executing unverified builds may expose legacy signal data."></div>
+          <div class="line" data-text=">   Proceed only if authorised for Project GRD-1 access."></div>
+          <div class="line" data-text=""></div>
+          <div class="line" data-text="> SELECT FILE TO EXECUTE"></div>
+          <div class="await" id="awaitLine">&gt; AWAITING INPUT <span class="cursor"></span></div>
+          <div class="actions" id="actions">
+            <button class="action" id="readmeBtn">README.TXT</button>
+            <button class="action" id="exeBtn">GHOSTWATCH.EXE</button>
+          </div>
+        </div>
+      </main>
+      <footer>
+        <span>Keys: A/1 = README  ·  B/2 = GHOSTWATCH</span>
+        <span>© LAWMAN MOS / GRD‑1 ARCHIVE</span>
+      </footer>
+    </section>
+  </div>
+
+  <div id="wipe"></div>
+</div>
+
+<script>
+/* AUDIO — create + beep directly in trusted click, then reuse */
+let ac=null, master=null;
+function initAudioAndBeep(){
+  if(!ac){
+    try{
+      ac=new (window.AudioContext||window.webkitAudioContext)();
+      master=ac.createGain(); master.gain.value=0.14; master.connect(ac.destination);
+    }catch(e){ /* ignore */ }
+  }
+  try{ if(ac.state==='suspended'){ ac.resume(); } }catch(e){}
+  // ready beep immediately on click
+  quickBeep(920, 0.065);
+}
+function quickBeep(freq, dur){
+  if(!ac) return;
+  const o=ac.createOscillator(), g=ac.createGain();
+  o.type='square'; o.frequency.value=freq; o.connect(g); g.connect(master);
+  const t=ac.currentTime;
+  g.gain.setValueAtTime(0, t);
+  g.gain.linearRampToValueAtTime(0.25, t+0.004);
+  g.gain.exponentialRampToValueAtTime(0.0001, t+dur);
+  o.start(t); o.stop(t+dur);
+}
+function tickRandom(dur=0.028){
+  if(!ac) return;
+  const freq=1000+Math.random()*600;
+  const o=ac.createOscillator(), g=ac.createGain();
+  o.type='square'; o.frequency.value=freq; o.connect(g); g.connect(master);
+  const t=ac.currentTime;
+  g.gain.setValueAtTime(0,t);
+  g.gain.linearRampToValueAtTime(0.22,t+0.004);
+  g.gain.exponentialRampToValueAtTime(0.0001,t+dur);
+  o.start(t); o.stop(t+dur);
+}
+
+/* Elements */
+const startBtn=document.getElementById('startBtn');
+const wipe=document.getElementById('wipe');
+const gateway=document.getElementById('gateway');
+const archive=document.getElementById('archive');
+const actions=document.getElementById('actions');
+const awaitLine=document.getElementById('awaitLine');
+const lawmanLogo=document.getElementById('lawmanLogo');
+const gatewayFx=document.getElementById('gatewayFx');
+
+/* Ensure logo glow starts after paint */
+window.addEventListener('DOMContentLoaded', ()=>{
+  requestAnimationFrame(()=> lawmanLogo.classList.add('ready'));
+});
+
+let started=false;
+function activate(){
+  if(started) return; started=true;
+  initAudioAndBeep(); // play in trusted click handler
+  gatewayFx.style.animationPlayState='paused';
+  wipe.classList.add('active');
+  setTimeout(()=>{
+    gateway.style.display='none';
+    archive.style.visibility='visible';
+    requestAnimationFrame(()=>{ typeSequence(); });
+  },700);
+}
+startBtn.addEventListener('click',activate);
+window.addEventListener('keydown',e=>{ if(e.code==='Enter'||e.code==='Space') activate(); });
+
+/* Typing with ticks */
+async function typeOut(element, text){
+  element.textContent="";
+  for(let i=0;i<text.length;i++){ element.textContent+=text[i]; tickRandom(0.022); await new Promise(r=>setTimeout(r,5)); }
+  element.classList.add('show'); await new Promise(r=>setTimeout(r,60));
+}
+async function typeSequence(){
+  const groups=[[0,1],[2],[3,4,5],[6],[7,8,9],[10,11]];
+  const lines=[...document.querySelectorAll('.terminal .line')];
+  for(const grp of groups){
+    for(const idx of grp){ const l=lines[idx]; const txt=l?.dataset.text||""; await typeOut(l, txt); }
+    await new Promise(r=>setTimeout(r,220));
+  }
+  awaitLine.style.display='block';
+  actions.style.display='inline-flex';
+}
+
+/* Navigation */
+const README_URL="https://behindthecurtains.github.io/GRD-1_Live/ReadMe.html";
+const EXE_URL="https://behindthecurtains.github.io/GRD-1_Live/GRD-1_Master.html";
+
+// --- Overlayed README host inside main interface ---
+const terminal = document.getElementById('terminal');
+
+// Create iframe + return button once
+const readmeFrame = document.createElement('iframe');
+readmeFrame.src = '';
+readmeFrame.id = 'readmeFrame';
+readmeFrame.style.cssText = `
+  position:absolute; inset:0; width:100%; height:100%;
+  border:none; background:#fff; display:none; z-index:4;
+`;
+terminal.appendChild(readmeFrame);
+
+const returnBtn = document.createElement('button');
+returnBtn.textContent = 'RETURN TO ARCHIVE';
+returnBtn.className = 'action';
+Object.assign(returnBtn.style, {
+  position:'absolute',
+  bottom:'20px',
+  right:'20px',
+  zIndex:'5',
+  display:'none'
+});
+terminal.appendChild(returnBtn);
+
+// README button behaviour: load iframe
+document.getElementById('readmeBtn').addEventListener('click', ()=>{
+  quickBeep(820,0.05);
+  actions.style.display='none';
+  awaitLine.style.display='none';
+  terminal.querySelectorAll('.line').forEach(l=>l.style.opacity=0);
+  readmeFrame.src = "GRD-1_ReadMe.html";
+  readmeFrame.style.display='block';
+  setTimeout(()=>returnBtn.style.display='block',2000);
+});
+
+// RETURN button behaviour
+returnBtn.addEventListener('click', ()=>{
+  quickBeep(720,0.05);
+  readmeFrame.style.display='none';
+  returnBtn.style.display='none';
+  terminal.querySelectorAll('.line').forEach(l=>l.style.opacity=1);
+  awaitLine.style.display='block';
+  actions.style.display='inline-flex';
+});
+
+document.getElementById('exeBtn').addEventListener('click',()=>location.href=EXE_URL);
+window.addEventListener('keydown',e=>{
+  const k=e.key.toLowerCase();
+  if(k==='a'||k==='1') location.href=README_URL;
+  if(k==='b'||k==='2') location.href=EXE_URL;
+});
+</script>
+</body>
+</html>
