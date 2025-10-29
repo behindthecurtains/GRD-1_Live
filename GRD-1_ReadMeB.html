@@ -1,0 +1,222 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>GRD-1 README.TXT</title>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+html,body{
+  margin:0;
+  height:100%;
+  background:#000;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-family:'Share Tech Mono',monospace;
+  overflow-x:hidden;
+  overflow-y:auto;
+}
+.window{
+  width:90vw;
+  max-width:800px;
+  aspect-ratio:4/3;
+  background:#e3e3e3;
+  border:3px solid #222;
+  box-shadow:0 6px 18px rgba(0,0,0,.7);
+  display:flex;
+  flex-direction:column;
+  overflow:hidden;
+  position:relative;
+}
+.titlebar{background:#111;color:#eee;padding:4px 10px;font-size:13px;display:flex;justify-content:space-between;align-items:center}
+.toggle{font-size:11px;color:#6eff64;user-select:none}
+.content{flex:1;padding:12px 18px;font-size:16px;line-height:1.4;color:#1b2b4f;white-space:pre-wrap;overflow-y:scroll;background:#e3e3e3;scrollbar-width:thin;font-family:'Helvetica','Arial',sans-serif}
+.bold{font-weight:700;color:#000;font-family:'Share Tech Mono',monospace}
+.red{color:#a00;font-weight:700;font-family:'Share Tech Mono',monospace}
+.buttonBox{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;z-index:2}
+#runBtn{position:relative;background:#ccc;border:2px solid #333;padding:10px 28px;font-family:'Share Tech Mono',monospace;font-size:14px;font-weight:bold;cursor:pointer;overflow:hidden;transition:opacity .3s ease}
+#runBtn:hover{background:#ddd}
+.glitchLayer{position:absolute;inset:0;background:#fff;opacity:0;z-index:5}
+#flash{position:absolute;inset:0;background:#fff;opacity:0;pointer-events:none;z-index:3;transition:opacity .15s linear}
+.flashOn{opacity:1}
+.footer{width:100%;text-align:center;color:#666;font-size:80%;margin-top:8px}
+@media (max-width: 768px) {
+  .window {
+    box-shadow:0 3px 10px rgba(0,0,0,.6);
+  }
+  .content {
+    font-size:14px;
+    padding:10px;
+  }
+}
+</style>
+</head>
+<body>
+<div class="window" id="win">
+  <div id="flash"></div>
+  <div class="titlebar">
+    README.TXT — GRD-1 Retrieval Archive
+    <div class="toggle">Mode: Teleprinter</div><button id="returnBtn" style="background:none;border:2px solid #6eff64;color:#6eff64;font-family:'Share Tech Mono',monospace;font-size:12px;padding:2px 8px;margin-left:10px;cursor:pointer;transition:all .2s ease;">RETURN</button>
+  </div>
+  <div class="content" id="screen"><div id="out"></div></div>
+  <div class="buttonBox" id="btnBox">
+    <button id="runBtn">&gt; EXECUTE_COMPILE</button>
+  </div>
+</div>
+
+<audio id="beep" preload="auto"
+ src="data:audio/wav;base64,UklGRpYAAABXQVZFZm10IBAAAAABAAEAQB8AAIA+AAACABAAZGF0YZQAAAAA////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A"></audio>
+
+<script>
+const sections=[
+{text:"//BBC Systems Internal / Data Capture Test / 31-10-24//",bold:true},
+{text:"GRD-1 README.TXT INITIALISING...",bold:true},
+{text:"",bold:false},
+{text:"────────────────────────────────────────────────",bold:false},
+{text:" BBC ENGINEERING AUXILIARY STORAGE UNIT — TUNSTALL, STAFFS.",bold:false},
+{text:"────────────────────────────────────────────────",bold:false},
+{text:"HIGHLY CONFIDENTIAL — AUTHORISED ACCESS ONLY.",bold:true,red:true},
+{text:"UNAUTHORISED HANDLING OR DUPLICATION IS STRICTLY PROHIBITED.",bold:true,red:true},
+{text:"",bold:false},
+{text:"GRD-1 RETRIEVAL ARCHIVE — FIELD DATA: FOXHILL INCIDENT",bold:true},
+{text:"",bold:false},
+{text:"Source media recovered from Engineering Vault B, catalogue marked “A.S.U. / OB7 / PROG. LDPS505T”. Material identified as recovered PASDEM sensor data — installed by A. Demescu (Physics & Sound) to monitor temperature / frequency / acoustic anomalies within the property at Foxhill Drive during live transmission.",bold:false},
+{text:"",bold:false},
+{text:"Data structure indicates the sensors buffered to external storage via LAWMAN MOS interface during the event. This disk represents a redundant backup set. Three files remain encrypted and are locked pending credentials known only to those with sensitive knowledge of the broadcast.",bold:false},
+{text:"",bold:false},
+{text:"Cross-reference with surviving OB logs indicates the recording platform was a British Leyland Freighter outside-broadcast vehicle (registration F158 OYM). Vehicle failed to return to Kendal Avenue OB Unit upon instruction. Located three days later on an access road beside the disused rail line at the edge of Foxhill — a stretch of ground locally referred to as “Mother’s Cut”. Early parish records trace the name to a domestic servant born 1846, executed in October 1888 for multiple child murders. Folklore persists that she “watched the line for strays.”",bold:false},
+{text:"",bold:false},
+{text:"Interior showed signs of recent occupation. One thermos flask with aprx. 20ml vestigal dilute citric solution, a pair of yellow Sennheiser HD420SL headphones (left earpad showing recent impact damage), and two reel tags (OB7/92) marked on the reverse ‘LAB REF – DOOR’. No other personal items were recovered.",bold:false},
+{text:"",bold:false},
+{text:"A leather dog collar was found resting on the sound mixer’s fader panel. The collar’s owner tag was engraved:",bold:false},
+{text:"",bold:false},
+{text:"“CASSIE”",bold:true},
+{text:"M. CHRISTOPHER",bold:true},
+{text:"27 LARCHMEAD CLOSE",bold:true},
+{text:"NORTHOLT UB5",bold:true},
+{text:"",bold:false},
+{text:"When power was restored, monitors briefly displayed residual luminance from a paused frame — the Landing Camera B feed — before system shutdown. Audio bleed persisted for approximately six seconds.",bold:false},
+{text:"",bold:false},
+{text:"Recovery team noted a faint, cloying odour within the capture bay — damp wiring and brassica decay, sharp and chemical — that lingered in clothing for several hours.",bold:false},
+{text:"",bold:false},
+{text:"Recommend no further playback without engineering supervision. Do not attempt manual decryption — refer to Post-Transmission Analysis Group.",bold:false},
+{text:"",bold:false},
+{text:"────────────────────────────────────────────────",bold:false},
+{text:"FILE VERIFIED    : GRD1_R7.BIN",bold:true},
+{text:"CHECKSUM         : 3F9A-00B1-C2E7-0042",bold:true},
+{text:"BUILD DATE       : 03 / 04 / 1993",bold:true},
+{text:"CHECKSUM WARNING : DATA DRIFT +0.004  / PASDEM SENSOR VARIANCE 17.2 s",bold:true},
+{text:"────────────────────────────────────────────────",bold:false},
+{text:"",bold:false},
+{text:"ADDITIONAL NOTE:",bold:true},
+{text:"The collar was reportedly still warm to the touch.",bold:false}
+];
+
+let ctx=null;
+function audio(){ if(!ctx) ctx=new (window.AudioContext||window.webkitAudioContext)(); return ctx; }
+
+function tickSound(){
+  try{
+    const c=audio(); if(c.state==="suspended") c.resume();
+    const o=c.createOscillator(), g=c.createGain();
+    o.type="square"; o.frequency.value=200 + Math.random()*150;
+    g.gain.value=0.05; o.connect(g); g.connect(c.destination);
+    o.start(); o.stop(c.currentTime+0.025);
+  }catch(e){}
+}
+function bleep(freq=880,dur=0.05,gain=0.12){
+  try{
+    const c=audio(); if(c.state==="suspended") c.resume();
+    const o=c.createOscillator(), g=c.createGain();
+    o.type="square"; o.frequency.value=freq;
+    g.gain.value=gain; o.connect(g); g.connect(c.destination);
+    o.start(); o.stop(c.currentTime+dur);
+  }catch(e){}
+}
+function glitchPop(){
+  try{
+    const c=audio(); if(c.state==="suspended") c.resume();
+    const o1=c.createOscillator(), o2=c.createOscillator(), g=c.createGain();
+    o1.type="square"; o2.type="sawtooth";
+    o1.frequency.value=100; o2.frequency.value=40;
+    g.gain.value=0.25; o1.connect(g); o2.connect(g); g.connect(c.destination);
+    o1.start(); o2.start();
+    g.gain.exponentialRampToValueAtTime(0.0001,c.currentTime+0.25);
+    o1.stop(c.currentTime+0.3); o2.stop(c.currentTime+0.3);
+  }catch(e){}
+}
+
+const btn=document.getElementById('runBtn'),btnBox=document.getElementById('btnBox'),
+out=document.getElementById('out'),screen=document.getElementById('screen'),
+flash=document.getElementById('flash'),beep=document.getElementById('beep');
+
+btn.onclick=()=>{
+ if(window.GRDRan) return; window.GRDRan=true;
+ try{beep.currentTime=0;beep.play();}catch(e){}
+ glitchPop();
+ btn.disabled=true;
+ let flickers=0;
+ const flickerInterval=setInterval(()=>{
+   btn.style.opacity=Math.random()>0.5?0.2:1;
+   btn.style.transform=`translate(${(Math.random()-0.5)*6}px, ${(Math.random()-0.5)*6}px)`;
+   flickers++;
+   if(flickers>10){
+     clearInterval(flickerInterval);
+     btn.style.opacity=0;
+     btn.style.transform='translate(0,0)';
+     setTimeout(()=>{btnBox.style.display='none';flash.classList.add('flashOn');},100);
+     setTimeout(()=>{flash.classList.remove('flashOn');},700);
+     setTimeout(runText,1600);
+   }
+ },50);
+};
+
+function runText(){
+ out.innerHTML="";let line=0,char=0;let current=document.createElement('div');
+ current.className=cls(sections[0]);out.appendChild(current);
+ function step(){
+   if(line>=sections.length){endSequence();return;}
+   const sec=sections[line];
+   if(char<sec.text.length){
+     current.textContent+=sec.text[char++];screen.scrollTop=screen.scrollHeight;
+     if(/[A-Za-z0-9]/.test(sec.text[char-1]))tickSound();
+     const d=sec.text.includes('HD420SL')?40:(15+Math.random()*20);setTimeout(step,d);
+   }else{
+     current.textContent+="\n";line++;char=0;
+     if(line<sections.length){current=document.createElement('div');current.className=cls(sections[line]);out.appendChild(current);}
+     setTimeout(step,60);
+   }
+ }
+ step();
+}
+
+function endSequence(){
+ setTimeout(()=>{
+  flash.classList.add('flashOn');setTimeout(()=>flash.classList.remove('flashOn'),70);
+  setTimeout(()=>bleep(880,0.05,0.16),90);
+  setTimeout(()=>bleep(660,0.05,0.16),240);
+  setTimeout(()=>{
+    const footer=document.createElement('div');footer.className='footer';
+    footer.textContent='[FILE TERMINATED]';out.appendChild(footer);screen.scrollTop=screen.scrollHeight;
+  },260);
+ },800);
+}
+function cls(s){return s.red?'red':(s.bold?'bold':'');}
+
+// RETURN button behaviour
+const returnBtn=document.getElementById('returnBtn');
+if(returnBtn){
+  returnBtn.addEventListener('click',()=>{
+    flash.classList.add('flashOn');
+    setTimeout(()=>{
+      flash.classList.remove('flashOn');
+      bleep(720,0.05,0.16);
+      setTimeout(()=>{window.parent.postMessage('attemptReboot','*');},400);
+    },400);
+  });
+}
+
+</script>
+</body>
+</html>
