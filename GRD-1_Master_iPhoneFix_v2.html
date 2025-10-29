@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>GRD-1 Master (iPhone Fix v2)</title>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+<style>
+html,body {
+  margin:0;
+  padding:0;
+  height:100%;
+  width:100%;
+  background:#000;
+  overflow:hidden;
+  touch-action:manipulation;
+  -webkit-text-size-adjust:100%;
+}
+#frame {
+  position:absolute;
+  top:50%;
+  left:50%;
+  transform:translate(-50%, -50%);
+  background:#000;
+  border:2px solid #aaffcc;
+  box-shadow:0 0 25px #aaffcc,0 0 50px #aaffcc;
+  overflow:hidden;
+  aspect-ratio:4 / 3;
+  width:min(100vw, calc(100vh * 4 / 3));
+  height:min(100vh, calc(100vw * 3 / 4));
+  transition:box-shadow 10s ease,border-color 10s ease;
+}
+iframe {
+  width:100%;
+  height:100%;
+  border:none;
+  display:block;
+}
+.transition {
+  position:absolute;
+  inset:0;
+  z-index:999;
+  background:#000;
+  pointer-events:none;
+  opacity:0;
+}
+@keyframes glitch2{
+  0%{opacity:0;}
+  10%{opacity:1;background:linear-gradient(0deg,#00f 0%,#000 10%,#00f 20%,#000 30%,#00f 40%,#000 50%,#00f 60%,#000 70%,#00f 80%,#000 100%);}
+  30%{filter:hue-rotate(60deg);}
+  50%{transform:translateX(5px);}
+  70%{transform:translateX(-5px);}
+  100%{opacity:0;}
+}
+@keyframes glitch3{
+  0%{opacity:0;}
+  20%{opacity:1;background:repeating-linear-gradient(180deg,#0f0 0 4px,#000 4px 8px);}
+  40%{filter:blur(2px);}
+  60%{transform:scaleY(1.1);}
+  80%{opacity:0.6;}
+  100%{opacity:0;}
+}
+@keyframes glitch4{
+  0%{opacity:0;}
+  25%{opacity:1;background:#f00;}
+  50%{filter:blur(3px);}
+  75%{opacity:1;background:#800;}
+  100%{opacity:0;}
+}
+</style>
+</head>
+<body>
+<div id="frame">
+  <iframe id="viewer" src="https://behindthecurtains.github.io/GRD-1_Live/GRD-1_0.html"></iframe>
+  <div id="transition" class="transition"></div>
+</div>
+<script>
+// Unlock audio context on first user gesture for iOS Safari
+document.addEventListener('touchstart', function unlockAudio() {
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const osc = ctx.createOscillator();
+    osc.connect(ctx.destination);
+    osc.start(0);
+    osc.stop(0);
+    console.log('[GRD-1 MASTER] Audio context unlocked');
+  } catch(e) {
+    console.warn('Audio unlock failed', e);
+  }
+  document.removeEventListener('touchstart', unlockAudio);
+}, { once: true });
+
+const iframe=document.getElementById('viewer');
+const trans=document.getElementById('transition');
+const frame=document.getElementById('frame');
+const ambiColors=["#aaffcc","#c41616","#66a3ff","#aaffcc"];
+let current=0;
+
+const experiences=[
+ "https://behindthecurtains.github.io/GRD-1_Live/GRD-1_0.html",
+ "https://behindthecurtains.github.io/GRD-1_Live/GRD-1_A.html",
+ "https://behindthecurtains.github.io/GRD-1_Live/GRD-1_B.html",
+ "https://behindthecurtains.github.io/GRD-1_Live/GRD-1_C.html",
+ "https://behindthecurtains.github.io/GRD-1_Live/GRD-1_D.html"
+];
+
+function log(msg){console.log(`[GRD-1 MASTER] ${msg}`);}
+
+function setAmbilight(color){
+  frame.style.borderColor=color;
+  frame.style.boxShadow=`0 0 25px ${color},0 0 50px ${color}`;
+}
+setAmbilight(ambiColors[0]);
+
+function playGlitchSound(type){
+  try{
+    const ctx=new (window.AudioContext||window.webkitAudioContext)();
+    const osc=ctx.createOscillator();
+    const gain=ctx.createGain();
+    osc.connect(gain).connect(ctx.destination);
+    osc.type="square";
+    osc.frequency.setValueAtTime(300,ctx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(50,ctx.currentTime+0.3);
+    gain.gain.setValueAtTime(0.2,ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+0.5);
+    osc.start(); osc.stop(ctx.currentTime+0.5);
+  }catch(e){}
+}
+
+function dataCollapseEffect(){
+  const cols=30;
+  for(let i=0;i<cols;i++){
+    const bar=document.createElement('div');
+    bar.style.position='absolute';
+    bar.style.width='20px';
+    bar.style.height='100%';
+    bar.style.left=(i*(frame.clientWidth/cols))+'px';
+    bar.style.background='linear-gradient(to bottom, rgba(100,205,136,0.8), rgba(0,0,0,0))';
+    bar.style.filter='blur(3px)';
+    bar.style.opacity='0.5';
+    bar.style.transform='translateY(-100%)';
+    bar.style.transition=`transform 1.2s ease-in ${Math.random()*0.3}s, opacity 1.2s ease-in ${Math.random()*0.3}s`;
+    trans.appendChild(bar);
+    setTimeout(()=>{
+      bar.style.transform='translateY(100%)';
+      bar.style.opacity='0';
+    },50);
+  }
+  setTimeout(()=>{trans.innerHTML='';},1500);
+}
+
+function playTransition(num,nextSrc){
+  playGlitchSound(num);
+  frame.style.transition='box-shadow 0.4s ease, border-color 0.4s ease';
+  setAmbilight('black');
+  trans.style.opacity=1;
+  dataCollapseEffect();
+  log(`Transition → ${nextSrc}`);
+  setTimeout(()=>{iframe.src=nextSrc;},600);
+  setTimeout(()=>{
+    trans.style.opacity=0;
+    frame.style.transition='box-shadow 10s ease, border-color 10s ease';
+    setAmbilight(ambiColors[num % ambiColors.length]);
+  },1500);
+}
+
+window.addEventListener("message",(e)=>{
+  const msg=e.data;
+  log(`Message received: ${msg}`);
+  if(msg==="openReadMe"){
+    playTransition(1,"https://behindthecurtains.github.io/GRD-1_Live/GRD-1_ReadMe.html");
+    iframe.onload=()=>injectReturnButton();
+  }
+  if(msg==="launchGhostwatch"){
+    current=1;
+    playTransition(1,experiences[current]);
+  }
+  if(msg==="experienceComplete"){
+    current++;
+    if(current<experiences.length){
+      const nextExp=experiences[current];
+      playTransition(current,nextExp);
+    } else {
+      log("All experiences complete.");
+    }
+  }
+  if(msg==="attemptReboot"){
+    current=0;
+    playTransition(4,experiences[0]);
+  }
+});
+
+function injectReturnButton(){
+  try{
+    const doc=iframe.contentDocument||iframe.contentWindow.document;
+    if(!doc) return;
+    const win=doc.querySelector('.window');
+    if(!win) return;
+    const existing=doc.getElementById('injectedReturn');
+    if(existing) existing.remove();
+    const btn=doc.createElement('button');
+    btn.id='injectedReturn';
+    btn.textContent='> RETURN';
+    btn.style.position='absolute';
+    btn.style.top='70px';
+    btn.style.right='20px';
+    btn.style.background='#ccc';
+    btn.style.border='2px solid #333';
+    btn.style.padding='8px 20px';
+    btn.style.fontFamily='Share Tech Mono, monospace';
+    btn.style.fontSize='14px';
+    btn.style.cursor='pointer';
+    btn.style.zIndex='10';
+    btn.style.transition='opacity 0.4s ease';
+    btn.onmouseenter=()=>btn.style.background='#ddd';
+    btn.onmouseleave=()=>btn.style.background='#ccc';
+    btn.onclick=()=>{
+      btn.style.opacity='0';
+      const flash=doc.getElementById('flash');
+      if(flash){flash.classList.add('flashOn');setTimeout(()=>flash.classList.remove('flashOn'),400);}
+      playTransition(4,experiences[0]);
+    };
+    win.appendChild(btn);
+  }catch(e){console.warn('Return inject fail',e);}
+}
+</script>
+</body>
+</html>
