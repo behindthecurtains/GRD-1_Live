@@ -1,0 +1,279 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>GRD-1 Archive CLEAN_04 (Audio)</title>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+<style>
+body {
+  margin:0;background:#000;color:#fff;
+  font-family:'Press Start 2P',monospace;
+  display:flex;justify-content:center;align-items:center;
+  height:100vh;overflow:hidden;
+}
+#grdArea {
+  width:800px;height:600px;padding:20px;background:#001c73;
+  border:2px solid #0044aa;box-sizing:border-box;position:relative;
+}
+.banner {background:#c41616;color:#fff;padding:12px 16px;font-weight:800;border-radius:4px;}
+.console {margin-top:16px;white-space:pre-wrap;overflow-y:auto;height:260px;
+          border:1px dashed rgba(255,255,255,0.06);padding:12px;font-size:14px;}
+#ynWrap {display:flex;justify-content:center;gap:20px;margin:20px 0;}
+.ynBtn {background:#fff;color:#001c73;border:2px solid #001c73;
+        padding:12px 28px;font-family:'Press Start 2P';cursor:pointer;border-radius:4px;}
+.ynBtn:hover {background:#001c73;color:#fff;}
+.progressRow {display:none;flex-direction:column;gap:6px;margin-top:16px;}
+.progressBar {height:12px;background:rgba(255,255,255,0.06);border-radius:3px;
+              overflow:hidden;border:1px solid rgba(255,255,255,0.12);}
+#progressFill {width:0%;height:100%;background:linear-gradient(90deg,#fff,#cfe7ff);
+               transition:width 0.1s linear;}
+#loginArea {display:none;margin-top:20px;padding:10px;border:1px solid rgba(255,255,255,0.2);
+            border-radius:4px;background:rgba(0,0,0,0.25);
+            justify-content:center;gap:10px;align-items:center;}
+#userInput {flex:0 0 180px;padding:8px;font-family:'Press Start 2P';
+            color:white;background:transparent;border:1px solid rgba(255,255,255,0.2);}
+#userEnter {padding:8px 16px;font-family:'Press Start 2P';cursor:pointer;
+            background:#fff;color:#001c73;border:2px solid #001c73;}
+#userEnter:hover {background:#001c73;color:#fff;}
+
+/* Overlay popups */
+.overlay {
+  position:absolute;inset:0;display:flex;justify-content:center;align-items:center;
+  background:rgba(0,0,0,0.9);opacity:0;pointer-events:none;transition:opacity 0.3s;
+}
+.overlay.visible {opacity:1;pointer-events:auto;}
+.overlay img {max-width:80%;max-height:80%;}
+.returnBtn {
+  position:absolute;top:20px;right:20px;
+  background:transparent;color:#fff;
+  border:2px solid #c41616;
+  padding:8px 12px;cursor:pointer;
+  font-family:'Press Start 2P';font-size:12px;
+}
+.returnBtn:hover {background:#c41616;color:#fff;}
+
+.overlay {
+  position:absolute;inset:0;display:flex;flex-direction:column;
+  justify-content:center;align-items:center;
+  background:rgba(0,0,0,0.9);opacity:0;pointer-events:none;transition:opacity 0.3s;
+}
+.overlay.visible {opacity:1;pointer-events:auto;}
+.overlay img {max-width:80%;max-height:70%;margin-bottom:12px;}
+.overlay .banner {
+  width:80%;
+  background:#c41616;
+  color:#fff;
+  text-align:center;
+  padding:6px 10px;
+  font-weight:800;
+  font-size:10px;
+  box-sizing:border-box;
+}
+
+</style>
+
+</head>
+<body>
+<div id="grdArea">
+  <div class="banner">WARNING ≫ GRD-1 ACCESS</div>
+  <div class="console" id="console">
+THE FOLLOWING RESEARCH FOOTAGE CONTAINS MATERIAL WHICH SOME VIEWERS MAY FIND DISTURBING.
+
+ARE YOU SURE YOU WISH TO CONTINUE?
+  </div>
+  <div id="ynWrap">
+    <button class="ynBtn" id="yesBtn">YES</button>
+    <button class="ynBtn" id="noBtn">NO</button>
+  </div>
+  <div class="progressRow" id="progressRow">
+    <div class="progressBar"><div id="progressFill"></div></div>
+  </div>
+  <div id="loginArea">
+    <div style="color:#dfefff;font-weight:700;">GRD-1 LOGIN</div>
+    <input id="userInput" placeholder="ENTER USERNAME" autocomplete="off">
+    <button id="userEnter">ENTER</button>
+  </div>
+
+  <div class="overlay" id="popup1"><img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhClEMt9AkXZIq3Q-voC3XGfJhGbs7egu6xLY84EezZ8OLE6wC9DB7L6O7Ocg6g1j_DokgZKhFpL-iL0Zip-G5PgiAEmIns54gKTmZEaePD86_-z7xPX_g6IDmRBzxqpRHIHmBzAfxzXOW47tBzcXBrGh78sQ0aSFk_erMV8ajb9uW6OY6Xe1QTUte4YSY/s1024/GRD-1_PopUp_01.jpg" alt="Unlocked Main Menu">
+  <div class="banner">UNLOCKED: MAIN MENU</div>
+  <button class="returnBtn" id="return1">RETURN TO LOGON</button>
+</div>
+  <div class="overlay" id="popup2"><img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEiXrgjdabd4ZysSoU13RthM6AqhqwSxBs-vRNlhkRrvAlPNQCVatm0HoBWf3OYrzdVLXhKbp3cHQ37DxwflD3qEEwvKtBiZ3D0VMWjdPXlms2vU8PyWKTWEcaRLOJW1EI8WRKJrEmc9WBWh8FhKeB9VN9_pqAKo42LPyMd89-mKZAHtkYl8AQSpspyJaKQ/s1024/GRD-1_PopUp_02.jpg" alt="Unlocked October Children Booklet">
+  <div class="banner">UNLOCKED: 'OCTOBER CHILDREN' COLLECTORS' BOOKLET (TBC)</div>
+  <button class="returnBtn" id="return2">RETURN TO LOGON</button>
+</div>
+  <div class="overlay" id="popup3"><img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEiu2FPJVKBfLDrzXswxbpoWEy1UwQFddvZLk-oMGaKkxkoXOFDi9ODd_z5ZjYXxvD8TY0DkHMpuEX-xlzcT2JgG350tuVcJLlcLsO3VjcHCruot8MN2p7Kpcsrhh-4HgrRwjZJRuViED3MME8l4uH_sWwa6Ik5SyyBOrng4geAgoRtpO2nRlHrfddusvgY/s1024/GhostwatchOTN_GRD-1_PopUp_03.jpg" alt="Unlocked In The Machine Slip Cover">
+  <div class="banner">UNLOCKED: 'IN THE MACHINE' SLIP COVER (TBC)</div>
+  <button class="returnBtn" id="return3">RETURN TO LOGON</button>
+</div></div>
+
+<script>
+/* ------------------------- AUDIO CORE ------------------------- */
+let audioCtx=null, master=null;
+function ensureAudio(){
+  if(!audioCtx){
+    audioCtx=new (window.AudioContext||window.webkitAudioContext)();
+    master=audioCtx.createGain(); master.gain.value=0.8; master.connect(audioCtx.destination);
+  }
+  if(audioCtx.state==='suspended'){ audioCtx.resume(); }
+}
+function beep(f=440,dur=0.08,vol=0.08,type='square'){
+  try{
+    ensureAudio();
+    const osc=audioCtx.createOscillator();
+    const gain=audioCtx.createGain();
+    osc.type=type;
+    osc.frequency.value=f*(1+(Math.random()-0.5)*0.04); // tiny drift
+    gain.gain.value=0;
+    osc.connect(gain); gain.connect(master);
+    const now=audioCtx.currentTime;
+    gain.gain.linearRampToValueAtTime(vol, now+0.005);
+    gain.gain.linearRampToValueAtTime(0.0001, now+dur);
+    osc.start(now);
+    osc.stop(now+dur+0.02);
+  }catch(e){/* ignore */}
+}
+function glitchBuzz(level=1){
+  // Detuned dual-oscillator + noise burst, intensity scales with level [1..7]
+  try{
+    ensureAudio();
+    const now=audioCtx.currentTime;
+    const g=audioCtx.createGain(); g.gain.value=0.12*level/7; g.connect(master);
+    // Osc 1
+    const o1=audioCtx.createOscillator(); o1.type='square';
+    o1.frequency.value=180 + 20*level + (Math.random()*30);
+    // Osc 2 detuned
+    const o2=audioCtx.createOscillator(); o2.type='sine';
+    o2.frequency.value=160 + 15*level + (Math.random()*40);
+    // subtle LFO for warble
+    const lfo=audioCtx.createOscillator(); const lfoGain=audioCtx.createGain();
+    lfo.frequency.value=1+level*0.3; lfoGain.gain.value=5+level*3;
+    lfo.connect(lfoGain); lfoGain.connect(o2.frequency);
+    // noise
+    const noiseBuf=audioCtx.createBuffer(1, audioCtx.sampleRate*0.12, audioCtx.sampleRate);
+    const data=noiseBuf.getChannelData(0);
+    for(let i=0;i<data.length;i++){ data[i]=(Math.random()*2-1)*0.25*(level/7); }
+    const noise=audioCtx.createBufferSource(); noise.buffer=noiseBuf;
+    const nGain=audioCtx.createGain(); nGain.gain.value=0.06*level/7;
+    noise.connect(nGain); nGain.connect(g);
+
+    o1.connect(g); o2.connect(g);
+    o1.start(now); o2.start(now); lfo.start(now); noise.start(now+0.02);
+
+    // envelope
+    const end=now+0.18+0.02*level;
+    g.gain.setValueAtTime(0.0001, now);
+    g.gain.exponentialRampToValueAtTime(0.08*level/7+0.02, now+0.03);
+    g.gain.linearRampToValueAtTime(0.0001, end);
+    o1.stop(end); o2.stop(end); lfo.stop(end); noise.stop(end);
+  }catch(e){/* ignore */}
+}
+
+/* ------------------------- DOM HOOKS ------------------------- */
+const yesBtn=document.getElementById('yesBtn');
+const noBtn=document.getElementById('noBtn');
+const progress=document.getElementById('progressFill');
+const progressRow=document.getElementById('progressRow');
+const login=document.getElementById('loginArea');
+const consoleEl=document.getElementById('console');
+const userInput=document.getElementById('userInput');
+const correctUsers=['SCANNER','LABRADOR','SEDDONS'];
+let unlocked=[];
+
+/* ------------------------- FLOW ------------------------- */
+yesBtn.onclick=function(){
+  ensureAudio();
+  document.getElementById('ynWrap').style.display='none';
+  progressRow.style.display='flex';
+  let p=0,fileIndex=0;
+  const unpackFiles=['PASCOE_92.LOG','LIVE_FEED_CAM3.BIN','OCC_FIELD_REPORT.TXT','PIPES_VISUAL.DAT','FOXHILL_DRIVE_TELEMETRY.BIN','CEEFAX_SCRAPE.TXT'];
+  const timer=setInterval(()=>{
+    p+=2;
+    progress.style.width=p+'%';
+    if(p%16===0 && fileIndex<unpackFiles.length){
+      consoleEl.textContent+='\n> UNPACKING: '+unpackFiles[fileIndex];
+      consoleEl.scrollTop=consoleEl.scrollHeight;
+      beep(660,0.05,0.08,'square'); // unpack pip
+      fileIndex++;
+    }
+    if(p>=100){
+      clearInterval(timer);
+      consoleEl.textContent+='\nARCHIVE READY.\nLOGIN REQUIRED.';
+      consoleEl.scrollTop=consoleEl.scrollHeight;
+      login.style.display='flex';
+      userInput.focus();
+    }
+  },100);
+};
+
+noBtn.onclick=function(){
+  ensureAudio();
+  consoleEl.textContent+='\nERROR: USER ATTEMPTED TO DECLINE - ACCESSING ARCHIVE ANYWAY';
+  consoleEl.scrollTop=consoleEl.scrollHeight;
+  beep(300,0.08,0.08,'sine');
+  yesBtn.onclick();
+};
+
+/* ------------------------- LOGIN ------------------------- */
+function handleLogin(){
+  ensureAudio();
+  const input=userInput.value.trim().toUpperCase();
+  userInput.value='';
+  if(!input)return;
+  if(correctUsers.includes(input)){
+    if(unlocked.includes(input)){
+      consoleEl.textContent+='\n> DUPLICATE ENTRY: '+input+' ALREADY VERIFIED';
+      beep(440,0.1,0.1,'square'); // duplicate
+    } else {
+      unlocked.push(input);
+      consoleEl.textContent+='\n> LOGIN ACCEPTED: '+input;
+      beep(880,0.1,0.12,'square'); // correct
+      const popup=document.getElementById('popup'+unlocked.length);
+      if(popup) popup.classList.add('visible');
+    }
+  } else {
+    consoleEl.textContent+='\n> INVALID LOGIN – PLEASE TRY AGAIN';
+    beep(220,0.12,0.1,'square'); // invalid
+  }
+  consoleEl.scrollTop=consoleEl.scrollHeight;
+}
+document.getElementById('userEnter').onclick=handleLogin;
+userInput.addEventListener('keypress',e=>{ if(e.key==='Enter'){ handleLogin(); } });
+
+/* ------------------------- POPUPS & ANOMALY ------------------------- */
+['return1','return2','return3'].forEach((id,i)=>{
+  document.getElementById(id).onclick=()=>{
+    document.getElementById('popup'+(i+1)).classList.remove('visible');
+    if(i===2){ setTimeout(triggerAnomaly,600); }
+  };
+});
+
+function triggerAnomaly(){
+  const lines=[
+    'WARNING: ANOMALOUS ENTITY DETECTED!',
+    'DATA VALIDATION LOOP FAILURE',
+    'QUERY RESPONSE MISALIGNED',
+    'REMOTE SYSTEM RESPONDING OUTSIDE PROTOCOL',
+    'ARCHIVE RETURNING UNSENT COMMANDS',
+    'INPUT STREAM NOT RECOGNISED',
+    'ROUND... AND... ROUND... THE... GARDEN...'
+  ];
+  let i=0;
+  function next(){
+    if(i<lines.length){
+      // red output
+      consoleEl.innerHTML+=`<div style="color:#ff5555;font-weight:700;">${lines[i]}</div>`;
+      consoleEl.scrollTop=consoleEl.scrollHeight;
+      // progressively nastier buzz
+      glitchBuzz(i+1);
+      i++;
+      setTimeout(next,900);
+    } else {
+      window.parent.postMessage('experience-complete','*');
+    }
+  }
+  next();
+}
+</script>
+</body>
+</html>
